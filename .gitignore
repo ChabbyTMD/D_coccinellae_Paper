@@ -1,0 +1,11 @@
+/DATA
+*.Rproj.user
+*.xlsx
+*.RData
+*.Rhistory
+*.Rproj
+*.html
+*-workspace
+multivariate_multiple_regression.Rmd
+Midterm3.Rmd
+RDA and Multiple_regression.Rmd
