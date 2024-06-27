@@ -1,0 +1,401 @@
+---
+title: "BIOL 606 Midterm 3"
+author: "Scott Monahann and Trevor Mugoya"
+date: "`r Sys.Date()`"
+output: html_document
+---
+Load important libraries 
+```{r}
+library(corrplot)
+library(factoextra)
+library(vegan)
+library(tidyverse)
+library(ggplot2)
+library(Hmisc)
+library(readxl)
+# Note: before installing MVN package ensure that libgsl is installed with sudo apt-get install libgsl-dev
+library(MVN)
+library(heplots)
+library(devtools)
+install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
+library(pairwiseAdonis)
+```
+Let's start by addressing an important experimental validation: Are the beetles we used actually different sizes?
+We have 3 host species, supposedly small, medium, and large. We have 8 morphometric measurements for each of these.
+
+To do this, we can perform a Multivariate Analysis of Variance (MANOVA). MANOVA assumes homogeneity of covariance matrices as well as multivariate normality. 
+
+Start by importing the data.
+```{r}
+#This data format is insane, read in the whole file and it's easier to manipulate in R
+hostData=read_excel("DATA/morpho_data_analysis.xlsx",sheet="host_size_var_nomissing",col_names=TRUE)
+hostData=subset(hostData,select=c(1,2,8,14,20,26,32,38,44))
+hostData=hostData[-c(46:51),]
+# hostData=rename(hostData,HostSpecies = HostSpecies...1) This errors out
+names(hostData)[names(hostData) == "HostSpecies...1"] <- "HostSpecies"
+
+#Now it's usable 
+View(hostData)
+```
+
+Test for multivariate normality
+```{r}
+#There are many tests for multivariate normality, these are just a few
+mvn(subset(hostData,select=-c(HostSpecies)),mvnTest="mardia")
+mvn(subset(hostData,select=-c(HostSpecies)),mvnTest="hz")
+mvn(subset(hostData,select=-c(HostSpecies)),mvnTest="royston")
+
+#All of these say there is not multivariate normality, but we can still visualize it on a graph
+mvn(subset(hostData,select=-c(HostSpecies)),multivariatePlot="qq")
+#This skews really far from the normality line, definitely not multivariate normal
+```
+
+The test that checks for homogeneity of covariance matrices also assumes multivariate normality, so not much of a point of checking it. Because we can't meet the assumptions of MANOVA, we can use its non-parametric equivalent PERMANOVA. The only assumption here is that samples are interchangeable given the null hypothesis is true 
+
+```{r}
+#Run PERMANOVA (ran on 100,000 permutations p = 1e-06. Set to 10000 for easy processing)
+hostPerm=adonis2(hostData[,2:length(hostData)]~HostSpecies,data=hostData,permutations=10000)
+hostPerm
+#Very significant, we can conduct a pairwise PERMANOVA to see which differences are significant 
+hostPairPerm = pairwise.adonis2(hostData[,2:length(hostData)]~HostSpecies,data=hostData,permutations=10000)
+hostPairPerm
+#All beetles are significantly different from each other!!!
+```
+
+
+```{r}
+?pairwise.adonis2
+
+```
+
+
+Now that we know each of our hosts are different sizes, we can ask questions about the wasps.
+
+Are wasps that come from large hosts larger than wasps that come from small hosts? 
+Ha: Wasps that come from large hosts are larger than wasps that come from small hosts (high phenotypic plasticity)
+Ho: Wasps that come from large hosts are not a significantly different size than those that come from small hosts (high heritability)
+
+We can compare the means of three multivariate datasets using a MANOVA. MANOVAs assume multivariate normality and homogeneity of covariance 
+
+Start by importing and arranging the data
+```{r}
+WaspData=read_excel("morph_data_bk.xlsx")
+WaspData=subset(WaspData,select=-c(o.ms,p.ms)) #Mass data is missing for a lot, sample size is already limited so we should remove
+
+#Let's split the dataframes into parent and offspring wasps. This will be useful for later analysis.
+pWasp=WaspData[,c(1,4:9)]#Remove parent ID (not too important here) and the grouped host category (we're not combining C. maculata and H. convergens)
+oWasp=WaspData[,c(10,13:length(WaspData))]#Same as before 
+
+#Let's also make a dataframe that just has all of our wasps and their host species 
+# totWasp=rbind(rename(pWasp,Host=p.host, wl=p.wl, tl=p.tl,td=p.td,al=p.al,hd=p.hd,hl=p.hl), rename(oWasp, Host=o.host, wl=o.wl, tl=o.tl,td=o.td,al=o.al,hd=o.hd,hl=o.hl))
+
+names(pWasp)[names(pWasp) == "p.host"] <- "Host"
+names(pWasp)[names(pWasp) == "p.wl"] <- "wl"
+names(pWasp)[names(pWasp) == "p.tl"] <- "tl"
+names(pWasp)[names(pWasp) == "p.td"] <- "td"
+names(pWasp)[names(pWasp) == "p.al"] <- "al"
+names(pWasp)[names(pWasp) == "p.hd"] <- "hd"
+names(pWasp)[names(pWasp) == "p.hl"] <- "hl"
+names(oWasp)[names(oWasp) == "o.host"] <- "Host"
+names(oWasp)[names(oWasp) == "o.wl"] <- "wl"
+names(oWasp)[names(oWasp) == "o.tl"] <- "tl"
+names(oWasp)[names(oWasp) == "o.td"] <- "td"
+names(oWasp)[names(oWasp) == "o.al"] <- "al"
+names(oWasp)[names(oWasp) == "o.hd"] <- "hd"
+names(oWasp)[names(oWasp) == "o.hl"] <- "hl"
+
+totWasp=rbind(pWasp, oWasp)
+  
+#We now have 4 data frames: waspData contains all information, oWasp contains all the offspring wasps, pWasp contains all parent wasps, and totWasp that contains all wasps and their host species). Our data isn't balanced very well (33 C. mac, 17 C. sep, 30 H. con), but it's much better than if we grouped C.mac and H. Con.
+```
+
+Because the test that checks for homogeneity of covariance also assumes multivariate normality, let's start by checking that 
+```{r}
+#There are many tests for multivariate normality, these are just a few
+mvn(subset(totWasp,select=-c(Host)),mvnTest="mardia")
+mvn(subset(totWasp,select=-c(Host)),mvnTest="hz")
+mvn(subset(totWasp,select=-c(Host)),mvnTest="royston")
+
+#All of these say there is not multivariate normality, but we can still visualize it on a graph
+mvn(subset(totWasp,select=-c(Host)),multivariatePlot="qq")
+#This doesnt skew insanely far from the plot, but the tests are pretty sensitive when data is not balanced.
+```
+
+Because we don't meet the assumptions for MANOVA, we can use it's non-parametric equivalent PERMANOVA
+```{r}
+#Run PERMANOVA 
+waspPerm = adonis2(totWasp[,c("wl","tl","td","al","hd","hl")]~Host,data=totWasp,permutations=10000)
+waspPerm
+#We have a significant difference, we can now conduct a pairwise PERMANOVA to see where the differences lie
+waspPairPerm = pairwise.adonis2(totWasp[,c("wl","tl","td","al","hd","hl")]~Host,data=totWasp,permutations=10000)
+waspPairPerm
+# Wasps from C. mac and C. sep are not significantly different! But C. mac and H. con are, and C. Sep and H. con are.
+```
+
+
+
+
+
+
+
+
+
+
+THIS CHUNK WAS DONE WHEN C. MACULATA AND H. CONVERGENS ARE GROUPED AS "SMALL"
+
+
+Are wasps that come from large hosts larger than wasps that come from small hosts? 
+Ha: Wasps that come from large hosts are larger than wasps that come from small hosts (high phenotypic plasticity)
+Ho: Wasps that come from large hosts are not a significantly different size than those that come from small hosts (high heritability)
+
+We can compare the means of two multivariate datasets using Hotelling's T-squared test.
+Hotelling's T-squared test has 4 assumptions:
+1) Data from sample i comes from a population with mean vector mu_i (This is hard to check, but we can say it's okay if we have no reason to think that there are many subpopulations within our small and large host populations)
+2) The data from both populations have a similar variance/covariance matrix. Hotelling's T-test is sensitive to violating this assumption, so it should be checked using Box's M test. Box's M test assumes multivariate normality and is very sensitive if violated.
+3) Data points are individually sampled (easy to check)
+4) Multivariate normality (Should be checked, but hotellings t-test is sensitive to this violation)
+Start by importing and arranging the data
+
+Start by importing and arranging the data
+```{r}
+library(tidyverse)
+WaspData=read_excel("DATA/morph_data_bk.xlsx")
+WaspData=subset(WaspData,select=-c(o.ms,p.ms)) #Mass data is missing for a lot, sample size is already limited so we should remove
+
+#Let's split the dataframes into parent and offspring wasps. This will be useful for later analysis.
+pWasp=WaspData[,c(2,4:9)]#Remove parent ID (not too important here) and the host species (we're combining into just small and large)
+oWasp=WaspData[,c(11,13:length(WaspData))]#Same as before 
+
+#Let's also split our data to contain only wasps from small hosts and wasps from only large hosts
+#Take all the smalls from oWasp
+smallWasp = subset(oWasp,o.host.sl=="small")
+#rename the columns
+# smallWasp = rename(smallWasp, Host=o.host.sl, wl=o.wl, tl=o.tl,td=o.td,al=o.al,hd=o.hd,hl=o.hl)
+# For compatibility if above fails..
+names(smallWasp)[names(smallWasp) == "o.host.sl"] <- "Host"
+names(smallWasp)[names(smallWasp) == "o.wl"] <- "wl"
+names(smallWasp)[names(smallWasp) == "o.tl"] <- "tl"
+names(smallWasp)[names(smallWasp) == "o.td"] <- "td"
+names(smallWasp)[names(smallWasp) == "o.al"] <- "al"
+names(smallWasp)[names(smallWasp) == "o.hd"] <- "hd"
+names(smallWasp)[names(smallWasp) == "o.hl"] <- "hl"
+#This line renames the columns from pWasp (so it can be joined to smallWasp) and then joins them together
+names(pWasp)[names(pWasp) == "p.host.sl"] <- "Host"
+names(pWasp)[names(pWasp) == "p.wl"] <- "wl"
+names(pWasp)[names(pWasp) == "p.tl"] <- "tl"
+names(pWasp)[names(pWasp) == "p.td"] <- "td"
+names(pWasp)[names(pWasp) == "p.al"] <- "al"
+names(pWasp)[names(pWasp) == "p.hd"] <- "hd"
+names(pWasp)[names(pWasp) == "p.hl"] <- "hl"
+
+smallWasp = rbind(smallWasp,subset(pWasp, Host=="small"))
+
+# smallWasp = rbind(smallWasp,subset(rename(pWasp,Host=p.host.sl, wl=p.wl, tl=p.tl,td=p.td,al=p.al,hd=p.hd,hl=p.hl),Host=="small"))
+
+#Do the same thing as before but with large wasps
+largeWasp = subset(oWasp,o.host.sl=="large")
+#rename the columns
+# largeWasp = rename(largeWasp, Host=o.host.sl, wl=o.wl, tl=o.tl,td=o.td,al=o.al,hd=o.hd,hl=o.hl)
+# For compatibility
+names(largeWasp)[names(largeWasp) == "o.host.sl"] <- "Host"
+names(largeWasp)[names(largeWasp) == "o.wl"] <- "wl"
+names(largeWasp)[names(largeWasp) == "o.tl"] <- "tl"
+names(largeWasp)[names(largeWasp) == "o.td"] <- "td"
+names(largeWasp)[names(largeWasp) == "o.al"] <- "al"
+names(largeWasp)[names(largeWasp) == "o.hd"] <- "hd"
+names(largeWasp)[names(largeWasp) == "o.hl"] <- "hl"
+largeWasp = rbind(largeWasp, subset(pWasp, Host=="large"))
+# largeWasp = rbind(largeWasp,subset(rename(pWasp,Host=p.host.sl, wl=p.wl, tl=p.tl,td=p.td,al=p.al,hd=p.hd,hl=p.hl),Host=="large"))
+
+#We now have 5 data frames: waspData contains all information, oWasp contains all the offspring wasps, pWasp contains all parent wasps, smallWasp contains all wasps that came from small hosts (parent and offspring), largeWasp contains all wasps that came from large hosts (parent and offspring).
+```
+
+Now that our data is arranged, we can start checking the assumptios for hotelling's t-squared test.
+Assumption 1 and 3 were met during our sampling (we don't believe there are subpopulations and our samples were collected individually)
+Assumption 3: Homogeneity of covariance matrices. We check this using Box's M test, but this assumes multivariate normality. Because Hotelling's t-squared test also assumes this, we should check this first. 
+
+```{r}
+#There are many tests to check for multivariate normality, but they can provide very different p-values 
+mvn(data=subset(smallWasp,select=-c(Host)),mvnTest="mardia")
+mvn(data=subset(smallWasp,select=-c(Host)),mvnTest="hz")
+mvn(data=subset(smallWasp,select=-c(Host)),mvnTest="royston")
+mvn(data=subset(largeWasp,select=-c(Host)),mvnTest="mardia")
+mvn(data=subset(largeWasp,select=-c(Host)),mvnTest="hz")
+mvn(data=subset(largeWasp,select=-c(Host)),mvnTest="royston")
+#And essentially none of them say our data meets multivariate normlity.
+#Similar to univariate normality, these tests can often be too restrictive for practicable application in ecology. We can visualize the normality and see if it's close enough for our needs 
+
+mvn(data=subset(smallWasp,select=-c(Host)),multivariatePlot="qq")
+mvn(data=subset(largeWasp,select=-c(Host)),multivariatePlot="qq")
+
+#Not the best... but let's role with it 
+```
+
+Now that we've checked for multivariate normality, we can check for homogeneity of covariance matrices
+```{r}
+#Combine small and large dataframes
+slWasp=rbind(smallWasp,largeWasp)
+
+#Run test. Ho: Samples have similar covariance matrices Ha: Samples have different covariance matrices
+BoxTest = boxM(cbind(wl,tl,td,al,hd,hl)~Host,data=slWasp)
+summary(BoxTest)
+#Reject null hypothesis, populations do not have similar covariance matrices
+#Hotelling's t-squared test is already sensitive to homogeneity of covariance violations, but it is especially so when n1 != n2. Here, n1 = 63 and n2 = 17 so it is definitely not appropriate to use. 
+```
+
+Because we are not even close to meeting these assumptions, we can move on to a different test. MANOVA also asks for homogeneity of covariance as well as multivariate normality. PERMANOVA only assumes that observations are exchangeable under the null hypothesis. 
+```{r}
+#Run permanova (ran with 10,000,000 permutations and gave similar p-value)
+waspPerm = adonis2(slWasp[,c("wl","tl","td","al","hd","hl")]~Host,data=slWasp,permutations=10000)
+waspPerm
+#Holy shit it's significant
+#Concerns: PERMANOVA does not directly assume homogeneity of covariance matrices because it is tolerant of heterogeneity when the data is balanced. Our data is most definitely not balanced, so it is more sensitive to having heterogeneic covariance matrices. Because of this p-values should be taken with slight hesitation, but ours is pretty low.
+```
+
+
+
+
+# RDA Analysis
+```{r}
+library(tidyverse)
+library(vegan)
+library(RColorBrewer)
+getwd()
+# Data import
+
+WaspData=read_excel("morph_data_bk.xlsx")
+```
+
+```{r}
+panel.hist <- function(x, ...)
+{
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(usr[1:2], 0, 1.5) )
+    h <- hist(x, plot = FALSE)
+    breaks <- h$breaks; nB <- length(breaks)
+    y <- h$counts; y <- y/max(y)
+    rect(breaks[-nB], 0, breaks[-1], y, col = "blue", ...)
+}
+
+pairs(WaspData[,14:19],lower.panel = NULL, diag.panel = panel.hist)
+pairs(log(WaspData[,4:9]),lower.panel = NULL, diag.panel = panel.hist)
+
+WaspPCA <- prcomp(WaspData[,c(4:9,14:19)], center=T, scale. = T)
+
+summary(WaspPCA)
+
+fviz_screeplot(WaspPCA, addlabels = TRUE, ylim = c(0, 50))
+fviz_pca_biplot(WaspPCA,
+                label="var",
+                habillage = WaspData$o.host,
+                repel = T)
+
+fviz_pca_biplot(WaspPCA,
+                label="var",
+                habillage = WaspData$o.host.sl,
+                repel = T)
+
+WaspoffspringPCA <- prcomp(WaspData[,c(14:19)], center=T, scale. = T)
+fviz_pca_biplot(WaspoffspringPCA,
+                label="var",
+                habillage = WaspData$o.host,
+                repel = T)
+summary(WaspoffspringPCA)
+```
+
+# NMDS
+
+```{r}
+
+waspoffspring.nmds = metaMDS(WaspData[,c(14:19)], distance = "bray", k = 2, trace = 0)
+# Construct ordination plot.
+
+wasp_ord = ordiplot(waspoffspring.nmds, type = "none",
+                    main = paste0("Stress = ", round(waspoffspring.nmds$stress, dig=3)),
+                    las = 1)
+
+
+# Define vectors for Habitat levels and colors. These will be used to layer the points for the 6 habitats in the NMDS plot. The colors are generated using the brewer.pal function that is part of the RColorBrewer package. It generates a palate of colors upon taking in 2 parameters, number of colors to generate and pallet name. Pallet name can be whatever...
+
+waspcolors<-brewer.pal(nlevels(as.factor(WaspData$o.host)),"Set3")
+wasplevels<-levels(as.factor(WaspData$o.host))
+
+# This for loop draws points for each of the 6 habitat levels with distinct colors.
+
+for (species in 1:nlevels(as.factor(WaspData$o.host))){
+  points(wasp_ord, WaspData$o.host == wasplevels[species],what = "sites", pch = 20, 
+      col = waspcolors[species])
+}
+
+# Drawing ellipsoid hulls around the habitats.
+
+ordiellipse(waspoffspring.nmds, kind = "ehull", 
+            draw = "polygon",
+            groups = WaspData$o.host,
+            col = brewer.pal(nlevels(as.factor(WaspData$o.host)),"Set3"),
+            label = F)
+# Drawing habitat legend.
+legend("bottomleft",
+       legend = levels(as.factor(WaspData$o.host)),
+       col = brewer.pal(nlevels(as.factor(WaspData$o.host)),"Set3"),
+       pch = 20,
+       cex = 0.5,
+       title = "Species")
+```
+
+# RDA
+
+```{r}
+offspringwasp<-WaspData[,14:19]
+# p.wl, 
+parentwasp<-WaspData[,4:9]
+offspring.center<-scale(offspringwasp, center = T, scale = T)
+parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
+parent.center$parent_host<-WaspData$p.host
+parent.center$offspring_host<-WaspData$o.host
+wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+parent_host+offspring_host, data=parent.center)
+
+anova(wasp.rda, by='term', permutations = 9999)
+summary(wasp.rda)
+# Set scale = 2 because we are more interested in the correlations 
+wasp_rda_plot <- plot(wasp.rda, scaling =2, main='scale=2', display=c("sites", "species", "wa", "lc", "bp", "cn","ga"))
+wasp_rda_plot
+
+# Reducing our explanatory environmental variables.
+
+step.wasp <- step(wasp.rda, scope = formula(wasp.rda), test = "perm")
+summary(step.wasp)
+
+# Inspect for colinearity before creating a simpler model. Note that we are looking for VIF lower than 20.
+
+vif.cca(step.wasp)
+# All factors are less than 20 therefore we shall proceed by subsetting the parent.center dataframe to only include these terms in reduced.env
+
+reduced.env <- subset(parent.center, offspring_host==c("C. septempunctata", "H. convergens"))
+
+# Create new model with reduced terms.
+wasp.rda2 <- rda(offspring.center~p.td+p.hd+offspring_host, data = parent.center)
+summary(wasp.rda2)
+anova(wasp.rda2, by="term", perm=9999)
+# Construct ordination plot with reduced RDA model.
+ordiplot(wasp.rda2, scaling = 2, type = "none", cex = 10, xlab = "RDA1", ylab = "RDA2", cex.lab = 1.25)
+points(wasp.rda2, col="darkgrey", cex = 1)
+points(wasp.rda2, dis="sp", col="blue")
+text(wasp.rda2, dis="sp", col = "blue")
+text(wasp.rda2, dis="bp", col="black")
+```
+
+# GRAVEYARD
+
+```{r,eval=FALSE}
+# Failed to construct ordination plot with ggord due to dependency issues
+install.packages('ggord')
+
+# The DBRDA
+ord <-dbrda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+parent_host+offspring_host, data=parent.center, dist="bray")
+plot()
+ggord(ord)
+```
+
+
+
