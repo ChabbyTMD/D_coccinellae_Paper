@@ -17,7 +17,7 @@ library(readxl)
 library(MVN)
 library(heplots)
 library(devtools)
-install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
+# install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
 library(pairwiseAdonis)
 ```
 Let's start by addressing an important experimental validation: Are the beetles we used actually different sizes?
@@ -79,7 +79,7 @@ We can compare the means of three multivariate datasets using a MANOVA. MANOVAs 
 
 Start by importing and arranging the data
 ```{r}
-WaspData=read_excel("morph_data_bk.xlsx")
+WaspData=read_excel("DATA/morph_data_bk.xlsx")
 WaspData=subset(WaspData,select=-c(o.ms,p.ms)) #Mass data is missing for a lot, sample size is already limited so we should remove
 
 #Let's split the dataframes into parent and offspring wasps. This will be useful for later analysis.
@@ -255,7 +255,7 @@ waspPerm
 
 
 
-# RDA Analysis
+# D coccinellae PCA
 ```{r}
 library(tidyverse)
 library(vegan)
@@ -280,7 +280,7 @@ panel.hist <- function(x, ...)
 pairs(WaspData[,14:19],lower.panel = NULL, diag.panel = panel.hist)
 pairs(log(WaspData[,4:9]),lower.panel = NULL, diag.panel = panel.hist)
 
-WaspPCA <- prcomp(WaspData[,c(4:9,14:19)], center=T, scale. = T)
+WaspPCA <- prcomp(WaspData[,c(4:9,14:18)], center=T, scale. = T)
 
 summary(WaspPCA)
 
@@ -295,7 +295,7 @@ fviz_pca_biplot(WaspPCA,
                 habillage = WaspData$o.host.sl,
                 repel = T)
 
-WaspoffspringPCA <- prcomp(WaspData[,c(14:19)], center=T, scale. = T)
+WaspoffspringPCA <- prcomp(WaspData[,c(14:18)], center=T, scale. = T)
 fviz_pca_biplot(WaspoffspringPCA,
                 label="var",
                 habillage = WaspData$o.host,
@@ -303,50 +303,10 @@ fviz_pca_biplot(WaspoffspringPCA,
 summary(WaspoffspringPCA)
 ```
 
-# NMDS
+# Initial RDA
 
 ```{r}
-
-waspoffspring.nmds = metaMDS(WaspData[,c(14:19)], distance = "bray", k = 2, trace = 0)
-# Construct ordination plot.
-
-wasp_ord = ordiplot(waspoffspring.nmds, type = "none",
-                    main = paste0("Stress = ", round(waspoffspring.nmds$stress, dig=3)),
-                    las = 1)
-
-
-# Define vectors for Habitat levels and colors. These will be used to layer the points for the 6 habitats in the NMDS plot. The colors are generated using the brewer.pal function that is part of the RColorBrewer package. It generates a palate of colors upon taking in 2 parameters, number of colors to generate and pallet name. Pallet name can be whatever...
-
-waspcolors<-brewer.pal(nlevels(as.factor(WaspData$o.host)),"Set3")
-wasplevels<-levels(as.factor(WaspData$o.host))
-
-# This for loop draws points for each of the 6 habitat levels with distinct colors.
-
-for (species in 1:nlevels(as.factor(WaspData$o.host))){
-  points(wasp_ord, WaspData$o.host == wasplevels[species],what = "sites", pch = 20, 
-      col = waspcolors[species])
-}
-
-# Drawing ellipsoid hulls around the habitats.
-
-ordiellipse(waspoffspring.nmds, kind = "ehull", 
-            draw = "polygon",
-            groups = WaspData$o.host,
-            col = brewer.pal(nlevels(as.factor(WaspData$o.host)),"Set3"),
-            label = F)
-# Drawing habitat legend.
-legend("bottomleft",
-       legend = levels(as.factor(WaspData$o.host)),
-       col = brewer.pal(nlevels(as.factor(WaspData$o.host)),"Set3"),
-       pch = 20,
-       cex = 0.5,
-       title = "Species")
-```
-
-# RDA
-
-```{r}
-offspringwasp<-WaspData[,14:19]
+offspringwasp<-WaspData[,14:18]
 # p.wl, 
 parentwasp<-WaspData[,4:9]
 offspring.center<-scale(offspringwasp, center = T, scale = T)
@@ -374,7 +334,7 @@ vif.cca(step.wasp)
 reduced.env <- subset(parent.center, offspring_host==c("C. septempunctata", "H. convergens"))
 
 # Create new model with reduced terms.
-wasp.rda2 <- rda(offspring.center~p.td+p.hd+offspring_host, data = parent.center)
+wasp.rda2 <- rda(offspring.center~p.td+p.hd+offspring_host, data = reduced.env)
 summary(wasp.rda2)
 anova(wasp.rda2, by="term", perm=9999)
 # Construct ordination plot with reduced RDA model.
@@ -384,6 +344,165 @@ points(wasp.rda2, dis="sp", col="blue")
 text(wasp.rda2, dis="sp", col = "blue")
 text(wasp.rda2, dis="bp", col="black")
 ```
+
+
+```{r}
+# RDA analysis with seperate unilineal and multilineal setup.
+
+# create dataframes that contain unilineal records.
+
+subset_df_uni <- parent.center[parent.center$parent_host == parent.center$offspring_host, ]
+
+# create dataframe that contain multilineal records.
+
+subset_df_multi <- parent.center[parent.center$parent_host != parent.center$offspring_host, ]
+
+# The problem above is we do not have a way of attributing the unilineal and multilineal records to the offspring morphometrics matrix. Since we only have the centered and scaled values for the parent morphometrics.
+
+# Below we subset using the initial WaspData dataframe
+
+# unilineal setup
+uni_subset <- WaspData[WaspData$p.host == WaspData$o.host, ]
+
+
+# Performing RDA with unilineal setup only.
+
+# Sub-setting offspring morphological characteristics
+offspringwasp<-uni_subset[,13:18]
+
+# Sub-setting parent morphological characteristics.
+
+parentwasp<-uni_subset[,4:9]
+
+# Standardizing both parent and offspring morphometrics.
+offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
+parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
+# Renaming parent host and offspring host column
+parent.center$parent_host<-uni_subset$p.host
+parent.center$offspring_host<-uni_subset$o.host
+
+# Full RDA model with all parent morphometrics and all parent host and offspring hosts
+wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+parent_host+offspring_host, data=parent.center)
+# Full Model evaluation
+anova(wasp.rda, by='term', permutations = 9999)
+summary(wasp.rda)
+screeplot(wasp.rda)
+
+# R2 for the model fit for the constrained ordinations.
+R2 <- RsquareAdj(wasp.rda)$r.squared
+R2 
+
+# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains 41.8% of the variation in the data. 
+R2adj <- RsquareAdj(wasp.rda)$adj.r.squared
+R2adj 
+
+
+plot(wasp.rda, display=c("sp", "lc", "cn"), main="Triplot RDA matrix ~ env -scaling2-lc scores")
+arrows(0,0,spe2.sc[,1],spe2.sc[,2], length=0, lty=1,col='red')
+
+
+# Set scale = 2 because we are more interested in the correlations 
+# Scaling 2- correlation biplot (response variable focused): distances between objects are not approximate Euclidean distances. Angles between all vectors reflect linear correlation.
+wasp_rda_plot <- plot(wasp.rda, scaling =2, main='scale=2', display=c("species", "lc", "cn"))
+wasp_rda_plot
+# Thorax length is negatively correlated with wing length.
+
+# Reducing our explanatory environmental variables.
+
+step.wasp <- step(wasp.rda, scope = formula(wasp.rda), test = "perm")
+summary(step.wasp)
+
+# Inspect for colinearity before creating a simpler model. Note that we are looking for VIF lower than 20.
+
+vif.cca(step.wasp)
+# All factors are less than 20 therefore we shall proceed by subsetting the parent.center dataframe to only include these terms in reduced.env
+
+reduced.env <- subset(parent.center, parent_host==c("C. septempunctata", "H. convergens"))
+
+# Create new model with reduced terms.
+wasp.rda2 <- rda(offspring.center~p.td+p.hd+parent_host, data = parent.center)
+summary(wasp.rda2)
+anova(wasp.rda2, by="term", perm=9999)
+# Construct ordination plot with reduced RDA model.
+ordiplot(wasp.rda2, scaling = 2, type = "none", cex = 10, xlab = "RDA1", ylab = "RDA2", cex.lab = 1.25)
+points(wasp.rda2, col="darkgrey", cex = 1)
+points(wasp.rda2, dis="sp", col="blue")
+text(wasp.rda2, dis="sp", col = "blue")
+text(wasp.rda2, dis="bp", col="black")
+
+
+
+# multilineal setup
+
+multi_subset <- WaspData[WaspData$p.host != WaspData$o.host, ]
+
+# Performing RDA with unilineal setup only.
+
+# Sub-setting offspring morphological characteristics
+offspringwasp<-multi_subset[,13:18]
+
+# Sub-setting parent morphological characteristics.
+
+parentwasp<-multi_subset[,4:9]
+
+# Standardizing both parent and offspring morphometrics.
+offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
+parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
+# Renaming parent host and offspring host column
+parent.center$parent_host<-multi_subset$p.host
+parent.center$offspring_host<-multi_subset$o.host
+
+# Full RDA model with all parent morphometrics and all parent host and offspring hosts
+wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+parent_host+offspring_host, data=parent.center)
+# Full Model evaluation
+anova(wasp.rda, by='term', permutations = 9999)
+summary(wasp.rda)
+screeplot(wasp.rda)
+
+# R2 for the model fit for the constrained ordinations.
+R2 <- RsquareAdj(wasp.rda)$r.squared
+R2 
+
+# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains 41.8% of the variation in the data. 
+R2adj <- RsquareAdj(wasp.rda)$adj.r.squared
+R2adj 
+
+
+plot(wasp.rda, display=c("sp", "lc", "cn"), main="Triplot RDA matrix ~ env -scaling2-lc scores")
+arrows(0,0,spe2.sc[,1],spe2.sc[,2], length=0, lty=1,col='red')
+
+
+# Set scale = 2 because we are more interested in the correlations 
+# Scaling 2- correlation biplot (response variable focused): distances between objects are not approximate Euclidean distances. Angles between all vectors reflect linear correlation.
+wasp_rda_plot <- plot(wasp.rda, scaling =2, main='scale=2', display=c("species", "lc", "cn"))
+wasp_rda_plot
+# Thorax length is negatively correlated with wing length.
+
+# Reducing our explanatory environmental variables.
+
+step.wasp <- step(wasp.rda, scope = formula(wasp.rda), test = "perm")
+summary(step.wasp)
+
+# Inspect for colinearity before creating a simpler model. Note that we are looking for VIF lower than 20.
+
+vif.cca(step.wasp)
+# All factors are less than 20 therefore we shall proceed by subsetting the parent.center dataframe to only include these terms in reduced.env
+
+reduced.env <- subset(parent.center, parent_host==c("C. septempunctata", "H. convergens"))
+
+# Create new model with reduced terms.
+wasp.rda2 <- rda(offspring.center~p.td+p.hd+parent_host, data = parent.center)
+summary(wasp.rda2)
+anova(wasp.rda2, by="term", perm=9999)
+# Construct ordination plot with reduced RDA model.
+ordiplot(wasp.rda2, scaling = 2, type = "none", cex = 10, xlab = "RDA1", ylab = "RDA2", cex.lab = 1.25)
+points(wasp.rda2, col="darkgrey", cex = 1)
+points(wasp.rda2, dis="sp", col="blue")
+text(wasp.rda2, dis="sp", col = "blue")
+text(wasp.rda2, dis="bp", col="black")
+
+```
+
 
 # GRAVEYARD
 
@@ -395,6 +514,10 @@ install.packages('ggord')
 ord <-dbrda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+parent_host+offspring_host, data=parent.center, dist="bray")
 plot()
 ggord(ord)
+
+
+library(ggord)
+ggord(wasp.rda2, parent.center$offspring_host) + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ```
 
 
