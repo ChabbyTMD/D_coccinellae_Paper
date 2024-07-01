@@ -263,7 +263,7 @@ library(RColorBrewer)
 getwd()
 # Data import
 
-WaspData=read_excel("morph_data_bk.xlsx")
+WaspData=read_excel("DATA/morph_data_bk.xlsx")
 ```
 
 ```{r}
@@ -353,9 +353,7 @@ text(wasp.rda2, dis="bp", col="black")
 
 subset_df_uni <- parent.center[parent.center$parent_host == parent.center$offspring_host, ]
 
-# create dataframe that contain multilineal records.
 
-subset_df_multi <- parent.center[parent.center$parent_host != parent.center$offspring_host, ]
 
 # The problem above is we do not have a way of attributing the unilineal and multilineal records to the offspring morphometrics matrix. Since we only have the centered and scaled values for the parent morphometrics.
 
@@ -397,8 +395,8 @@ R2adj <- RsquareAdj(wasp.rda)$adj.r.squared
 R2adj 
 
 
-plot(wasp.rda, display=c("sp", "lc", "cn"), main="Triplot RDA matrix ~ env -scaling2-lc scores")
-arrows(0,0,spe2.sc[,1],spe2.sc[,2], length=0, lty=1,col='red')
+# plot(wasp.rda, display=c("sp", "lc", "cn"), main="Triplot RDA matrix ~ env -scaling2-lc scores")
+# arrows(0,0,spe2.sc[,1],spe2.sc[,2], length=0, lty=1,col='red')
 
 
 # Set scale = 2 because we are more interested in the correlations 
@@ -430,7 +428,11 @@ points(wasp.rda2, dis="sp", col="blue")
 text(wasp.rda2, dis="sp", col = "blue")
 text(wasp.rda2, dis="bp", col="black")
 
+```
+```{r}
+# create dataframe that contain multilineal records.
 
+subset_df_multi <- parent.center[parent.center$parent_host != parent.center$offspring_host, ]
 
 # multilineal setup
 
@@ -468,14 +470,14 @@ R2adj <- RsquareAdj(wasp.rda)$adj.r.squared
 R2adj 
 
 
-plot(wasp.rda, display=c("sp", "lc", "cn"), main="Triplot RDA matrix ~ env -scaling2-lc scores")
-arrows(0,0,spe2.sc[,1],spe2.sc[,2], length=0, lty=1,col='red')
+# plot(wasp.rda, display=c("sp", "lc", "cn"), main="Triplot RDA matrix ~ env -scaling2-lc scores")
+# arrows(0,0,spe2.sc[,1],spe2.sc[,2], length=0, lty=1,col='red')
 
 
 # Set scale = 2 because we are more interested in the correlations 
 # Scaling 2- correlation biplot (response variable focused): distances between objects are not approximate Euclidean distances. Angles between all vectors reflect linear correlation.
-wasp_rda_plot <- plot(wasp.rda, scaling =2, main='scale=2', display=c("species", "lc", "cn"))
-wasp_rda_plot
+# wasp_rda_plot <- plot(wasp.rda, scaling =2, main='scale=2', display=c("species", "lc", "cn"))
+# wasp_rda_plot
 # Thorax length is negatively correlated with wing length.
 
 # Reducing our explanatory environmental variables.
@@ -488,12 +490,19 @@ summary(step.wasp)
 vif.cca(step.wasp)
 # All factors are less than 20 therefore we shall proceed by subsetting the parent.center dataframe to only include these terms in reduced.env
 
-reduced.env <- subset(parent.center, parent_host==c("C. septempunctata", "H. convergens"))
 
 # Create new model with reduced terms.
-wasp.rda2 <- rda(offspring.center~p.td+p.hd+parent_host, data = parent.center)
+wasp.rda2 <- rda(offspring.center~p.al+p.hd, data = parent.center)
 summary(wasp.rda2)
 anova(wasp.rda2, by="term", perm=9999)
+
+# R2 for the model fit for the constrained ordinations.
+R2 <- RsquareAdj(wasp.rda2)$r.squared
+R2 
+
+# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains 21.1% of the variation in the data. 
+R2adj <- RsquareAdj(wasp.rda2)$adj.r.squared
+R2adj 
 # Construct ordination plot with reduced RDA model.
 ordiplot(wasp.rda2, scaling = 2, type = "none", cex = 10, xlab = "RDA1", ylab = "RDA2", cex.lab = 1.25)
 points(wasp.rda2, col="darkgrey", cex = 1)
@@ -502,6 +511,7 @@ text(wasp.rda2, dis="sp", col = "blue")
 text(wasp.rda2, dis="bp", col="black")
 
 ```
+
 
 
 # GRAVEYARD
