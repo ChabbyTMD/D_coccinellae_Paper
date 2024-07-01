@@ -307,7 +307,7 @@ summary(WaspoffspringPCA)
 
 ```{r}
 offspringwasp<-WaspData[,14:18]
-# p.wl, 
+
 parentwasp<-WaspData[,4:9]
 offspring.center<-scale(offspringwasp, center = T, scale = T)
 parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
@@ -345,13 +345,9 @@ text(wasp.rda2, dis="sp", col = "blue")
 text(wasp.rda2, dis="bp", col="black")
 ```
 
+# Unilineal RDA
 
 ```{r}
-# RDA analysis with seperate unilineal and multilineal setup.
-
-# create dataframes that contain unilineal records.
-
-subset_df_uni <- parent.center[parent.center$parent_host == parent.center$offspring_host, ]
 
 
 
@@ -421,6 +417,14 @@ reduced.env <- subset(parent.center, parent_host==c("C. septempunctata", "H. con
 wasp.rda2 <- rda(offspring.center~p.td+p.hd+parent_host, data = parent.center)
 summary(wasp.rda2)
 anova(wasp.rda2, by="term", perm=9999)
+
+# R2 for the model fit for the constrained ordinations.
+R2 <- RsquareAdj(wasp.rda)$r.squared
+R2 
+
+# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains 41.8% of the variation in the data. 
+R2adj <- RsquareAdj(wasp.rda2)$adj.r.squared
+R2adj 
 # Construct ordination plot with reduced RDA model.
 ordiplot(wasp.rda2, scaling = 2, type = "none", cex = 10, xlab = "RDA1", ylab = "RDA2", cex.lab = 1.25)
 points(wasp.rda2, col="darkgrey", cex = 1)
@@ -429,6 +433,8 @@ text(wasp.rda2, dis="sp", col = "blue")
 text(wasp.rda2, dis="bp", col="black")
 
 ```
+
+# Multilineal RDA
 ```{r}
 # create dataframe that contain multilineal records.
 
@@ -463,9 +469,9 @@ screeplot(wasp.rda)
 
 # R2 for the model fit for the constrained ordinations.
 R2 <- RsquareAdj(wasp.rda)$r.squared
-R2 
+R2 # 49% 
 
-# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains 41.8% of the variation in the data. 
+# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains 13% of the variation in the data. 
 R2adj <- RsquareAdj(wasp.rda)$adj.r.squared
 R2adj 
 
@@ -498,11 +504,11 @@ anova(wasp.rda2, by="term", perm=9999)
 
 # R2 for the model fit for the constrained ordinations.
 R2 <- RsquareAdj(wasp.rda2)$r.squared
-R2 
+R2 # 27.7%
 
-# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains 21.1% of the variation in the data. 
+# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains 21.19% of the variation in the data. 
 R2adj <- RsquareAdj(wasp.rda2)$adj.r.squared
-R2adj 
+R2adj #21.19%
 # Construct ordination plot with reduced RDA model.
 ordiplot(wasp.rda2, scaling = 2, type = "none", cex = 10, xlab = "RDA1", ylab = "RDA2", cex.lab = 1.25)
 points(wasp.rda2, col="darkgrey", cex = 1)
