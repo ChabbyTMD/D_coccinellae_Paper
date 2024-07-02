@@ -306,10 +306,12 @@ summary(WaspoffspringPCA)
 # Initial RDA
 
 ```{r}
-offspringwasp<-WaspData[,14:18]
+
+WaspData=read_excel("DATA/morph_data_bk.xlsx")
+offspringwasp<-WaspData[,14:19]
 
 parentwasp<-WaspData[,4:9]
-offspring.center<-scale(offspringwasp, center = T, scale = T)
+offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
 parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
 parent.center$parent_host<-WaspData$p.host
 parent.center$offspring_host<-WaspData$o.host
@@ -318,17 +320,54 @@ wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+parent_host+offspri
 anova(wasp.rda, by='term', permutations = 9999)
 summary(wasp.rda)
 # Set scale = 2 because we are more interested in the correlations 
-wasp_rda_plot <- plot(wasp.rda, scaling =2, main='scale=2', display=c("sites", "species", "wa", "lc", "bp", "cn","ga"))
-wasp_rda_plot
+# wasp_rda_plot <- plot(wasp.rda, scaling =2, main='scale=2', display=c("sites", "species", "wa", "lc", "bp", "cn","ga"))
+# wasp_rda_plot
+# R2 for the model fit for the constrained ordinations. This represents the relative and unadjusted contribution of each eigenvector and is therefore biased
+R2 <- RsquareAdj(wasp.rda)$r.squared
+R2 
 
+# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains 13.1% of the total variance in the data. 
+R2adj <- RsquareAdj(wasp.rda)$adj.r.squared
+R2adj 
+
+# Constructing ordination plot for our full RDA model. The triplot typically consists of 3 entities; sites, response variables and explanatory variables
+plot(wasp.rda)
+
+# For canonical analysis, model significance relies on permutation tests.The principle of a permutation test is to generate a reference distribution of the chosen statistic under the null hypothesis H0
+ # by randomly permuting appropriate elements of the data a large number of times and recomputing the statistic each time. Then, one compares the true value of the statistic to this reference distribution. The p value is computed as the proportion of the permuted values equal to or larger than the true (unpermuted) value of the statistic for a one-tailed test in the upper tail, like the F test used in RDA (Borcard, Gillet, and Legendre 2011).
+
+# null hypothesis the observed results can be produced by random chance. we reject the null hypothesis when the p value is less than 0.05
+
+# For an RDA we need to test for the significance of 3 things
+# Global RDA significance
+#  Performs a permutation test with 999 permutations and assess the F value to determine whether it is significant or not
+anova.cca(wasp.rda, permutations = 999) #p=0.079 we fail to reject the null hypothesis, the full RDA model with all parent morphological characteristics and parent and offspring hosts is not significant.
+# Axis significance
+# 
+
+anova.cca(wasp.rda, by = "axis") # none of the axes seem significant.
+
+# Explanatory variable significance
+anova.cca(wasp.rda, by = "terms")
+
+# parent abdomen length seems marginally significant term.
+
+# With multiple linear regression, we have to check that we do not have colinearity among predictors
+
+# In order to create our reduced RDA model we need to perform forward selection using the forward.sel() function
+# install package
+install.packages("packfor", repos = "http://R-Forge.R-project.org")
+
+sqrt(vif.cca(wasp.rda))
 # Reducing our explanatory environmental variables.
 
 step.wasp <- step(wasp.rda, scope = formula(wasp.rda), test = "perm")
 summary(step.wasp)
 
-# Inspect for colinearity before creating a simpler model. Note that we are looking for VIF lower than 20.
+# Inspect for colinearity before creating a simpler model. Note that we are looking for VIF lower than 20. or squareroot of VIF < 2
 
 vif.cca(step.wasp)
+
 # All factors are less than 20 therefore we shall proceed by subsetting the parent.center dataframe to only include these terms in reduced.env
 
 reduced.env <- subset(parent.center, offspring_host==c("C. septempunctata", "H. convergens"))
@@ -338,6 +377,14 @@ wasp.rda2 <- rda(offspring.center~p.td+p.hd+offspring_host, data = reduced.env)
 summary(wasp.rda2)
 anova(wasp.rda2, by="term", perm=9999)
 # Construct ordination plot with reduced RDA model.
+# R2 for the model fit for the constrained ordinations.
+R2 <- RsquareAdj(wasp.rda)$r.squared
+R2 
+
+# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains % of the variation in the data. 
+R2adj <- RsquareAdj(wasp.rda)$adj.r.squared
+R2adj 
+
 ordiplot(wasp.rda2, scaling = 2, type = "none", cex = 10, xlab = "RDA1", ylab = "RDA2", cex.lab = 1.25)
 points(wasp.rda2, col="darkgrey", cex = 1)
 points(wasp.rda2, dis="sp", col="blue")
