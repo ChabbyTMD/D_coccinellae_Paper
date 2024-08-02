@@ -1,5 +1,5 @@
 ---
-title: "BIOL 606 Midterm 3"
+title: "D. coccinellae Multivariate Stats"
 author: "Scott Monahann and Trevor Mugoya"
 date: "`r Sys.Date()`"
 output: html_document
@@ -10,7 +10,6 @@ library(corrplot)
 library(factoextra)
 library(vegan)
 library(tidyverse)
-library(ggplot2)
 library(Hmisc)
 library(readxl)
 # Note: before installing MVN package ensure that libgsl is installed with sudo apt-get install libgsl-dev
@@ -19,6 +18,9 @@ library(heplots)
 library(devtools)
 # install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
 library(pairwiseAdonis)
+library(packfor)
+library(languageR)
+setwd("/home/trevor/Desktop/SUMMER_2024/WASP/D_coccinellae_Paper")
 ```
 Let's start by addressing an important experimental validation: Are the beetles we used actually different sizes?
 We have 3 host species, supposedly small, medium, and large. We have 8 morphometric measurements for each of these.
@@ -60,12 +62,6 @@ hostPerm
 hostPairPerm = pairwise.adonis2(hostData[,2:length(hostData)]~HostSpecies,data=hostData,permutations=10000)
 hostPairPerm
 #All beetles are significantly different from each other!!!
-```
-
-
-```{r}
-?pairwise.adonis2
-
 ```
 
 
@@ -343,22 +339,38 @@ plot(wasp.rda)
 #  Performs a permutation test with 999 permutations and assess the F value to determine whether it is significant or not
 anova.cca(wasp.rda, permutations = 999) #p=0.079 we fail to reject the null hypothesis, the full RDA model with all parent morphological characteristics and parent and offspring hosts is not significant.
 # Axis significance
-# 
-
 anova.cca(wasp.rda, by = "axis") # none of the axes seem significant.
 
-# Explanatory variable significance
+# Explanatory variable significance i.e by term.
 anova.cca(wasp.rda, by = "terms")
 
 # parent abdomen length seems marginally significant term.
 
 # With multiple linear regression, we have to check that we do not have colinearity among predictors
-
-# In order to create our reduced RDA model we need to perform forward selection using the forward.sel() function
-# install package
-install.packages("packfor", repos = "http://R-Forge.R-project.org")
-
 sqrt(vif.cca(wasp.rda))
+
+#                             p.wl                            p.tl 
+#                        1.570892                        2.375418 
+#                            p.td                            p.al 
+#                        3.225587                        2.705612 
+#                            p.hd                            p.hl 
+#                        2.493576                        3.502987 
+#    parent_hostC. septempunctata        parent_hostH. convergens 
+#                        1.223503                        1.516912 
+# offspring_hostC. septempunctata     offspring_hostH. convergens 
+#                        1.405598                        1.289031 
+
+
+# Parent and offspring beetle host species are not colinear with other predictors. However parent wing length is the only morphometric that does not exhibit colinearirty among other predictors.
+# This implies that all other parent morphological characteristics exhibit higher than acceptable levels of colinearity (>2) with other predictors.
+
+
+
+# In order to create our reduced RDA model we need to perform forward selection using the forward.sel() function. 
+# It is important to note that forward selection can only be performed if the global model i.e. the model that contains all # nolint
+# explanatory variables is significant. If it is significant go ahead and perform forward selection.
+
+
 # Reducing our explanatory environmental variables.
 
 step.wasp <- step(wasp.rda, scope = formula(wasp.rda), test = "perm")
@@ -373,7 +385,7 @@ vif.cca(step.wasp)
 reduced.env <- subset(parent.center, offspring_host==c("C. septempunctata", "H. convergens"))
 
 # Create new model with reduced terms.
-wasp.rda2 <- rda(offspring.center~p.td+p.hd+offspring_host, data = reduced.env)
+wasp.rda2 <- rda(offspring.center~p.td+p.hd+offspring_host, data = parent.center)
 summary(wasp.rda2)
 anova(wasp.rda2, by="term", perm=9999)
 # Construct ordination plot with reduced RDA model.
@@ -392,6 +404,136 @@ text(wasp.rda2, dis="sp", col = "blue")
 text(wasp.rda2, dis="bp", col="black")
 ```
 
+```{r}
+WaspData=read_excel("DATA/morph_data_bk.xlsx")
+offspringwasp<-WaspData[,14:19]
+
+parentwasp<-WaspData[,4:9]
+offspring_standard <- decostand(offspringwasp, method = "standardize")
+```
+
+
+# RDA Method 2
+
+## Data import and initial data carpentry. 
+
+We import the wasp morphometric data and subset the offspring and parent morphometrics into 2 dataframes. 
+We then proceed to center and scale the data prior to constructing a full RDA model that contains the centered and scaled offspring morphometrics as our dependent response matrix and centered and scaled parent morphology as our independent predictor matrix along with parent and offspring bettle host as catergorical predictors.
+```{r}
+
+WaspData=read_excel("DATA/morph_data_bk.xlsx")
+offspringwasp<-WaspData[,14:19]
+
+parentwasp<-WaspData[,4:9]
+
+# Pairwise correlation in our environmental variables
+languageR::pairscor.fnc(parentwasp)
+
+offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
+parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
+parent.center$parent_host<-WaspData$p.host
+parent.center$offspring_host<-WaspData$o.host
+wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+parent_host+offspring_host, data=parent.center)
+```
+
+Next few chunks adapted from RDA tutorial : https://pmassicotte.github.io/stats-denmark-2019/07_rda.html#/recipe
+
+```{r}
+# R2 for the model fit for the constrained ordinations. This represents the relative and unadjusted contribution of each eigenvector and is therefore biased
+R2 <- RsquareAdj(wasp.rda)$r.squared
+R2 # 35.94% 
+
+# adjusted R^2. This measures the unbiased amount of explained variation and therefor our full RDA model explains ~13.8% of the total variance in the data. 
+R2adj <- RsquareAdj(wasp.rda)$adj.r.squared
+R2adj 
+
+
+R2.2 <- RsquareAdj(wasp.rda2)$r.squared
+R2.2 #0.2447329
+R2adj.2 <- RsquareAdj(wasp.rda2)$adj.r.squared
+R2adj.2 #0.1584167
+```
+
+## RDA model assessment.
+
+For an RDA we need to test for the significance of 3 things. Global RDA significance, Axis significance, Explanatory variable significance.
+```{r}
+
+# Global RDA significance
+#  Performs a permutation test with 999 permutations and assess the F value to determine whether it is significant or not
+
+anova.cca(wasp.rda, permutations = 999) 
+
+#p=0.079 we fail to reject the null hypothesis, the full RDA model with all parent morphological characteristics and parent and offspring hosts is not significant.
+
+# Axis significance
+anova.cca(wasp.rda, by = "axis") # none of the axes seem significant.
+
+# Explanatory variable significance i.e by term.
+anova.cca(wasp.rda, by = "terms")
+
+# parent abdomen length seems marginally significant term.
+
+
+# Wasp RDA 2 reduced
+anova.cca(wasp.rda2, permutations = 999) #model is significant 0.008
+anova.cca(wasp.rda2, by = 'axis') #RDA axis 1 is significant
+anova.cca(wasp.rda2, by = 'terms') # parent thorax depth and offspring host are signficant
+```
+
+## Model significance
+For canonical analysis, model significance relies on permutation tests.
+The principle of a permutation test is to generate a reference distribution of the chosen statistic under the null hypothesis H0 by randomly permuting appropriate elements of the data a large number of times and recomputing the statistic each time. 
+Then, one compares the true value of the statistic to this reference distribution. 
+The p value is computed as the proportion of the permuted values equal to or larger than the true (unpermuted) value of the statistic for a one-tailed test in the upper tail, like the F test used in RDA (Borcard, Gillet, and Legendre 2011).
+
+null hypothesis the observed results can be produced by random chance. we reject the null hypothesis when the p value is less than 0.05
+
+## Predictor colinearity
+
+```{r}
+# A sqaure root of VIF value of less than 2 is desirable.
+sqrt(vif.cca(wasp.rda))
+```
+
+Parent wing length, and all offspring and parent host species are 
+
+## Forward selection of full RDA model
+```{r}
+# forward selection of explanatory variables
+
+# Forward selection
+fs <- forward.sel(offspring.center, # Y matrix
+  parent.center[1:6], # X matrix
+  adjR2thresh = R2adj, # Set the adj.R2 threshold
+  alpha = 0.001, # Set alpha level
+  nperm = 999  # Number of permutations
+)
+fs
+# Forward selection failed as p value for variable 1 is greater than 0.001 i.e. 0.019
+
+```
+
+## Ordination plot
+```{r}
+ordiplot(wasp.rda, scaling = 2, type = "none", cex = 10, xlab = "RDA1", ylab = "RDA2", cex.lab = 1.25)
+points(wasp.rda, col="darkgrey", cex = 1)
+points(wasp.rda, dis="sp", col="blue")
+text(wasp.rda, dis="sp", col = "blue")
+text(wasp.rda, dis="bp", col="black")
+```
+
+
+```{r}
+# unexplained variance by looking at residual variation in the data based on Kaiser-Guttman criterion
+wasp.rda2$CA$eig[wasp.rda2$CA$eig > mean(wasp.rda2$CA$eig)]
+```
+```{r}
+```
+```{r}
+```
+```{r}
+```
 # Unilineal RDA
 
 ```{r}
