@@ -47,7 +47,7 @@ pairs(log(WaspData[,4:9]),lower.panel = NULL, diag.panel = panel.hist)
 
 # Pairwise correlation in our environmental variables
 languageR::pairscor.fnc(parentwasp)
-
+# NOTES: The data seem normally distributed for about half of the measured parent morphological characteristics(abdomen length-al, thorax length-tl & wing length-wl). The rest of the morphological measurements seem to have a degree of right skew
 WaspPCA <- prcomp(WaspData[,c(4:9,14:18)], center=T, scale. = T)
 
 summary(WaspPCA)
@@ -171,5 +171,14 @@ summary(pc_RDA)
 anova.cca(pc_RDA, permutations = 999) 
 anova.cca(pc_RDA, by = "axis") 
 anova.cca(pc_RDA, by = "terms")
+
+# checking colinearity of predictors(principle components) in RDA model
+
+sqrt(vif.cca(pc_RDA))
+
+# Collinearity metric between predictors in the stock dataset before scaling and centering is 81 which is a potentially high and harmful degree of collinearity
+collin.fnc(dplyr::select(WaspData, p.wl, p.tl, p.td, p.al, p.hd, p.hl))$cnumber
+# After centering and scaling predictors, we see that collinearity decreases to an acceptable level of 8.5
+collin.fnc(dplyr::select(parent.center, p.wl, p.tl, p.td, p.al, p.hd, p.hl))$cnumber
 
 ```
