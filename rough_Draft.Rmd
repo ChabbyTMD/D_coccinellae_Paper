@@ -82,7 +82,7 @@ parent.center$parent_host<-WaspData$p.host
 parent.center$offspring_host<-WaspData$o.host
 # Full RDA model
 wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+parent_host+offspring_host, data=parent.center)
-wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+offspring_host, data=parent.center)
+# wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+offspring_host, data=parent.center)
 
 anova(wasp.rda, by='term', permutations = 9999)
 summary(wasp.rda)
