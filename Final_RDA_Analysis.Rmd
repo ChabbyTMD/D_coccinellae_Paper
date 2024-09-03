@@ -1,0 +1,202 @@
+---
+title: "D. coccinellae Multivariate Stats"
+author: "Scott Monahann and Trevor Mugoya"
+date: "`r Sys.Date()`"
+output: pdf
+---
+# libraries
+Load important libraries 
+```{r, include=F}
+# setwd("/set/path/here")
+library(corrplot)
+library(factoextra)
+library(vegan)
+library(tidyverse)
+library(Hmisc)
+library(readxl)
+# Note: before installing MVN package ensure that libgsl is installed with sudo apt-get install libgsl-dev
+library(MVN)
+library(heplots)
+library(devtools)
+# install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
+library(pairwiseAdonis)
+library(packfor)
+library(languageR)
+```
+# Data Import
+
+```{r}
+# Creating seperate dataframes for response(offspring morphology) and predictor(parent morphology and bettle host type) matrices
+WaspData=read_excel("DATA/morph_data_bk.xlsx")
+offspringwasp<-WaspData[,14:19]
+parentwasp<-WaspData[,4:9]
+```
+
+# Data Preparation
+```{r}
+# Center and scale both the morphometrics in the wasp offspring and parent matrices prior to fitting RDA model.
+offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
+parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
+parent.center$parent_host<-WaspData$p.host
+parent.center$offspring_host<-WaspData$o.host
+
+```
+Let's start by addressing an important experimental validation: Are the beetles we used actually different sizes?
+We have 3 host species, supposedly small, medium, and large. We have 8 morphometric measurements for each of these.
+
+To do this, we can perform a Multivariate Analysis of Variance (MANOVA). MANOVA assumes homogeneity of covariance matrices as well as multivariate normality. 
+
+Start by importing the data.
+#This data format is insane, read in the whole file and it's easier to manipulate in R
+
+```{r}
+
+hostData=read_excel("DATA/morpho_data_analysis.xlsx",sheet="host_size_var_nomissing",col_names=TRUE)
+hostData=subset(hostData,select=c(1,2,8,14,20,26,32,38,44))
+hostData=hostData[-c(46:51),]
+# hostData=rename(hostData,HostSpecies = HostSpecies...1) This errors out
+names(hostData)[names(hostData) == "HostSpecies...1"] <- "HostSpecies"
+
+#Now it's usable 
+View(hostData)
+```
+
+
+```{r}
+#Run PERMANOVA (ran on 100,000 permutations p = 1e-06. Set to 10000 for easy processing)
+hostPerm=adonis2(hostData[,2:length(hostData)]~HostSpecies,data=hostData,permutations=10000)
+hostPerm
+#Very significant, we can conduct a pairwise PERMANOVA to see which differences are significant 
+hostPairPerm = pairwise.adonis2(hostData[,2:length(hostData)]~HostSpecies,data=hostData,permutations=10000)
+hostPairPerm
+#All beetles are significantly different from each other!!!
+
+```
+
+
+Now that we know each of our hosts are different sizes, we can ask questions about the wasps.
+
+Are wasps that come from large hosts larger than wasps that come from small hosts? 
+Ha: Wasps that come from large hosts are larger than wasps that come from small hosts (high phenotypic plasticity)
+Ho: Wasps that come from large hosts are not a significantly different size than those that come from small hosts (high heritability)
+
+We can compare the means of three multivariate datasets using a MANOVA. MANOVAs assume multivariate normality and homogeneity of covariance 
+
+
+# Full RDA Model
+```{r}
+
+# Pairwise correlation in our environmental variables
+languageR::pairscor.fnc(parentwasp)
+# Center and Scale parent and offspring morphmometrics prior to fitting RDA model
+
+offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
+parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
+parent.center$parent_host<-WaspData$p.host
+parent.center$offspring_host<-WaspData$o.host
+# Full RDA model
+wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+parent_host+offspring_host, data=parent.center)
+# wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+offspring_host, data=parent.center)
+
+summary(wasp.rda)
+
+# For an RDA we need to test for the significance of 3 things
+# Global RDA significance
+#  Performs a permutation test with 999 permutations and assess the F value to determine whether it is significant or not
+anova.cca(wasp.rda, permutations = 999) #p~0.07 we fail to reject the null hypothesis, the full RDA model with all parent morphological characteristics and parent and offspring hosts is not significant.
+# Axis significance
+anova.cca(wasp.rda, by = "axis") # none of the axes seem significant.
+
+# Explanatory variable significance i.e by term.
+anova.cca(wasp.rda, by = "terms")
+
+# parent abdomen length seems marginally significant term.
+
+# The following function tests whether the order of the explanatory variables is significant
+anova.cca(wasp.rda, by = "margin")
+
+
+R2 <- RsquareAdj(wasp.rda)$r.squared
+R2 
+
+# adjusted R^2.
+R2adj <- RsquareAdj(wasp.rda)$adj.r.squared
+R2adj 
+
+
+# Final ordination plot for full RDA model
+ordiplot(wasp.rda, scaling = 2, type = "none", cex = 10, xlab = "RDA1", ylab = "RDA2", cex.lab = 1.25)
+points(wasp.rda, col="darkgrey", cex = 1)
+points(wasp.rda, dis="sp", col="#3300ff")
+text(wasp.rda, dis="sp", col = "blue")
+text(wasp.rda, dis="bp", col="black")
+
+```
+
+
+# Reduced RDA Model
+```{r}
+# Make copy of predictor matrix 
+parent.center.copy <- (parent.center)
+
+# Create new column to distinguish between unilineal and multilineal setups.
+parent.center.copy$setup <- ifelse(parent.center.copy$parent_host == parent.center.copy$offspring_host, "unilineal", "multilineal")
+
+# Step wise reduction of predictors.
+step.wasp <- step(wasp.rda, scope = formula(wasp.rda), test = "perm")
+summary(step.wasp)
+# p.td, p.hd, and offspring_host are the predictors in the best model.
+vif.cca(step.wasp)
+# VIF of predictors is less than 20, therefore we can proceed with the reduced model.
+wasp.rda2 <- rda(offspring.center ~ p.td + p.hd + offspring_host, data = parent.center.copy) 
+summary(wasp.rda2)
+RsquareAdj(wasp.rda2)$adj.r.squared
+sqrt(vif.cca(wasp.rda2))
+# Global RDA significance
+anova.cca(wasp.rda2, permutations = 9999) #We reject H0
+# Axis significance
+anova.cca(wasp.rda2, by = "axis")
+# Term significance
+anova.cca(wasp.rda2, by = "terms")
+anova(wasp.rda2, by="terms", permutations = 9999)
+# Inspect for colinearity before creating a simpler model. Note that we are looking for VIF lower than 20.
+# All our terms are less than 20, therefore we can proceed with the reduced model.
+vif.cca(wasp.rda2)
+# All factors are less than 20 therefore we shall proceed by subsetting the parent.center dataframe to only include these terms in reduced.env
+# Colinearity can be checked using the variance inflation factor function in the vif.cca package. 
+# We can carry on with forward selection if we find the model being significant.
+```
+
+# Final RDA Ordination Plot
+```{r}
+# Ordination plot parameter choices to specify RDA axes 1 and 2
+final_ord <- ordiplot(wasp.rda2, choices = c(1, 2))
+points(wasp.rda2, col = ifelse(parent.center.copy$setup == "unilineal", "blue", "red"))
+# points(other, dis="sp", col="#d400ff")
+text(wasp.rda2, dis="sp", col = "#d400ff")
+# text(other, labels = rownames(parent.center.copy), cex = 0.8)
+# text(wasp.rda2, dis="bp", col="black")
+legend(2.5,-2, legend = c("unilineal", "multilineal"), col = c("blue", "red"), pch = 1)
+ordiellipse(final_ord, groups=parent.center.copy$offspring_host, 
+                                   display="sites", 
+                                   kind="sd",
+                                   col="black",
+                                   label=T)
+
+# ordiellipse(final_ord, groups=parent.center.copy$parent_host, 
+#                                    display="sites", 
+#                                    kind="sd",
+#                                    col="red",
+#                                    label=T)
+title("RDA Analysis of Combined Unilineal and Multilineal Lines")
+```
+
+```{r}
+```
+
+```{r}
+```
+
+
+```{r}
+```
