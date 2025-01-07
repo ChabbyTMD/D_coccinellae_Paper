@@ -1,0 +1,297 @@
+---
+title: "D. coccinellae Multivariate Stats"
+author: "Scott Monahann and Trevor Mugoya"
+date: "`r Sys.Date()`"
+output: pdf
+---
+# libraries
+Load important libraries 
+```{r, include=F}
+# setwd("/set/path/here")
+
+setwd("/home/trevor/Desktop/SUMMER_2024/WASP/D_coccinellae_Paper")
+library(corrplot)
+library(factoextra)
+library(vegan)
+library(tidyverse)
+library(Hmisc)
+library(readxl)
+# Note: before installing MVN package ensure that libgsl is installed with sudo apt-get install libgsl-dev
+library(MVN)
+library(heplots)
+library(devtools)
+# install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
+library(pairwiseAdonis)
+library(packfor)
+library(languageR)
+library(multcompView)
+library(ggsignif)
+library(ggpubr)
+library(ggfortify)
+```
+# Data Import
+
+```{r}
+# Creating seperate dataframes for response(offspring morphology) and predictor(parent morphology and bettle host type) matrices
+WaspData=read_excel("DATA/morph_data_bk.xlsx")
+offspringwasp<-WaspData[,14:19]
+parentwasp<-WaspData[,4:9]
+```
+
+# Data Preparation
+```{r}
+# Center and scale both the morphometrics in the wasp offspring and parent matrices prior to fitting RDA model.
+offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
+parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
+parent.center$parent_host<-WaspData$p.host
+parent.center$offspring_host<-WaspData$o.host
+
+# Importing host species data
+hostData=read_excel("DATA/morpho_data_analysis.xlsx",sheet="host_size_var_nomissing",col_names=TRUE)
+# hostData <- read_excel("DATA/wasp_data.xlsx", sheet = "host_size_var_nomissing", col_names = TRUE)
+hostData=subset(hostData,select=c(1,2,8,14,20,26,32,38,44))
+hostData=hostData[-c(46:51),]
+# hostData=rename(hostData,HostSpecies = HostSpecies...1) This errors out
+names(hostData)[names(hostData) == "HostSpecies...1"] <- "HostSpecies"
+
+#Now it's usable 
+View(hostData)
+```
+
+# Figure 3.
+```{r}
+# library(tidyverse)
+
+# Reshape the data to long format
+hostData_long <- hostData %>%
+  pivot_longer(cols = -HostSpecies, names_to = "variable", values_to = "value")
+# Add size column to highlight bars based on size
+hostData_long <- hostData_long %>% mutate(Host_Size = ifelse(HostSpecies == "C. septempunctata", "Large", "Small"))
+
+# Create the facet wrap plot
+hostData_long$HostSpecies <- factor(hostData_long$HostSpecies, levels = c("C. maculata", "H. convergens", "C. septempunctata"))
+
+plot <- ggplot(hostData_long, aes(x = HostSpecies, y = value, fill = Host_Size)) +
+  geom_boxplot() +
+  facet_wrap(~ variable, scales = "free_y") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  		axis.text.y = element_text(size = 16),  # Increase y-axis text size
+        axis.title.x = element_text(size = 16),  # Increase x-axis title size
+        axis.title.y = element_text(size = 16),  # Increase y-axis title size
+        legend.text = element_text(size = 15),  # Increase legend text size
+        legend.title = element_text(size = 18)) +  # Increase legend title size
+  labs(x = "Host Species", y = "Length (mm)") +
+  scale_fill_discrete(name = "Host Size") +
+  geom_signif(
+      comparisons = list(c("C. maculata", "H. convergens"), c("C. maculata", "C. septempunctata"), c("H. convergens", "C. septempunctata")),
+      map_signif_level = TRUE
+  )
+#   scale_fill_manual(values = c("C. maculata" = "orange", "H. convergens" = "orange", "C. septempunctata" = "purple"))
+plot
+ggsave("Figure3.1.png", plot = plot, width = 14, height = 14, dpi = 300)
+
+```
+
+# Figure 3 condensed
+```{r}
+
+
+# Create the boxplot grouped by the variable column
+boxplot <- ggplot(hostData_long, aes(x = variable, y = value, fill = HostSpecies)) +
+    geom_boxplot() +
+    theme_classic() +
+    labs(x = "Body Segment", y = "Length (mm)", fill = "Host Species") +
+    theme(
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 12), # Increase x-axis text size
+        axis.text.y = element_text(size = 18), # Increase y-axis text size
+        axis.title.x = element_text(size = 18), # Increase x-axis title size
+        axis.title.y = element_text(size = 18), # Increase y-axis title size
+        legend.text = element_text(size = 16), # Increase legend text size
+        legend.title = element_text(size = 18) # Increase legend title size
+    ) +
+    scale_fill_manual(values = c("C. maculata" = "#dccc82", "H. convergens" = "#617bb8", "C. septempunctata" = "#b5646f"))
+    # geom_signif(
+    #     comparisons = list(c("Body Length")),
+    #     map_signif_level = TRUE
+    # )
+boxplot
+# Display the plot
+print(boxplot)
+
+# Save the figure
+ggsave("Figure3.2.png", plot = boxplot, width = 14, height = 14, dpi = 300)
+
+```
+
+# Figure 3 Alternate.
+```{r}
+# library(tidyverse)
+
+# Reshape the data to long format
+hostData_long <- hostData %>%
+  pivot_longer(cols = -HostSpecies, names_to = "variable", values_to = "value")
+# Add size column to highlight bars based on size
+hostData_long <- hostData_long %>% mutate(Host_Size = ifelse(HostSpecies == "C. septempunctata", "Large", "Small"))
+
+# Create the facet wrap plot
+hostData_long$HostSpecies <- factor(hostData_long$HostSpecies, levels = c("C. maculata", "H. convergens", "C. septempunctata"))
+
+plot2 <- ggplot(hostData_long, aes(x = HostSpecies, y = value, fill = HostSpecies)) +
+  geom_boxplot() +
+  facet_wrap(~ variable, scales = "free_y") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  		axis.text.y = element_text(size = 16),  # Increase y-axis text size
+        axis.title.x = element_text(size = 16),  # Increase x-axis title size
+        axis.title.y = element_text(size = 16),  # Increase y-axis title size
+        legend.text = element_text(size = 15),  # Increase legend text size
+        legend.title = element_text(size = 18)) +  # Increase legend title size
+  labs(x = "Host Species", y = "Length (mm)") +
+  scale_fill_discrete(name = "Host Species") +
+  scale_fill_manual(values = c("C. maculata" = "#dccc82", "H. convergens" = "#617bb8", "C. septempunctata" = "#b5646f")) +
+  geom_signif(
+      comparisons = list(c("C. maculata", "H. convergens"), c("C. maculata", "C. septempunctata"), c("H. convergens", "C. septempunctata")),
+      map_signif_level = TRUE
+  )
+#   scale_fill_manual(values = c("C. maculata" = "orange", "H. convergens" = "orange", "C. septempunctata" = "purple"))
+plot2
+ggsave("Figure3.1_alternate.png", plot = plot, width = 16, height = 14, dpi = 300)
+
+```
+
+# Figure 5
+```{r}
+# Create a new column denoting multilineal or unilineal lines
+# WaspData <- WaspData %>%
+#     mutate(lineage = ifelse(p.host == o.host, "Unilineal", "Multilineal"))
+
+# Wing length
+
+wl_regression_plot <- ggplot(WaspData, aes(x = p.wl, y = o.wl, color = lineage)) +
+    geom_point(size = 3) +
+    theme_classic() +
+    geom_smooth(method = "lm", se = F) +
+    labs(x = "Parent Wing Length (mm)", y = "Offspring Wing Length (mm)", color = "Type") +
+    scale_color_manual(values = c("Unilineal" = "red", "Multilineal" = "blue")) +
+    # scale_fill_discrete(name = "Type") +
+    theme(
+        axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 20),
+        axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        plot.title = element_text(size = 25, hjust = 0.5),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20)
+    ) 
+
+wl_regression_plot <- wl_regression_plot + stat_regline_equation(label.x = 2.6, size = 5, aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~~")))
+wl_regression_plot
+ggsave("Figure5.1.png", plot = wl_regression_plot, width = 14, height = 14, dpi = 300)
+
+# Thorax length
+tl_regression_plot <- ggplot(WaspData, aes(x = p.tl, y = o.tl, color = lineage)) +
+    geom_point(size = 3) +
+    theme_classic() +
+    geom_smooth(method = "lm", se = F) +
+    labs(x = "Parent Thorax Length (mm)", y = "Offspring Thorax Length (mm)", color = "Type") +
+    scale_color_manual(values = c("Unilineal" = "red", "Multilineal" = "blue")) +
+    # scale_fill_discrete(name = "Type") +
+    theme(
+        axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 20),
+        axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        plot.title = element_text(size = 25, hjust = 0.5),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20)
+    ) 
+
+tl_regression_plot <- tl_regression_plot + stat_regline_equation(label.x = 1.4, size = 5, aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~~")))
+tl_regression_plot
+ggsave("Figure5.2.png", plot = tl_regression_plot, width = 14, height = 14, dpi = 300)
+# Thorax Depth
+td_regression_plot <- ggplot(WaspData, aes(x = p.td, y = o.td, color = lineage)) +
+    geom_point(size = 3) +
+    theme_classic() +
+    geom_smooth(method = "lm", se = F) +
+    labs(x = "Parent Thorax Depth (mm)", y = "Offspring Thorax Depth (mm)", color = "Type") +
+    scale_color_manual(values = c("Unilineal" = "red", "Multilineal" = "blue")) +
+    # scale_fill_discrete(name = "Type") +
+    theme(
+        axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 20),
+        axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        plot.title = element_text(size = 25, hjust = 0.5),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20)
+    )
+td_regression_plot <- td_regression_plot + stat_regline_equation(label.x = 0.9, size = 5, aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~~")))
+td_regression_plot
+ggsave("Figure5.3.png", plot = td_regression_plot, width = 14, height = 14, dpi = 300)
+# Abdomen Length
+al_regression_plot <- ggplot(WaspData, aes(x = p.al, y = o.al, color = lineage)) +
+    geom_point(size = 3) +
+    theme_classic() +
+    geom_smooth(method = "lm", se = F) +
+    labs(x = "Parent Abdomen Length (mm)", y = "Offspring Abdomen Length (mm)", color = "Type") +
+    scale_color_manual(values = c("Unilineal" = "red", "Multilineal" = "blue")) +
+    # scale_fill_discrete(name = "Type") +
+    theme(
+        axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 20),
+        axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        plot.title = element_text(size = 25, hjust = 0.5),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20)
+    )
+al_regression_plot <- al_regression_plot + stat_regline_equation(label.x = 1.73, size = 5, aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~~")))
+al_regression_plot
+
+ggsave("Figure5.4.png", plot = al_regression_plot, width = 14, height = 14, dpi = 300)
+# Head Depth
+hd_regression_plot <- ggplot(WaspData, aes(x = p.hd, y = o.hd, color = lineage)) +
+    geom_point(size = 3) +
+    theme_classic() +
+    geom_smooth(method = "lm", se = F) +
+    labs(x = "Parent Head Depth (mm)", y = "Offspring Head Depth (mm)", color = "Type") +
+    scale_color_manual(values = c("Unilineal" = "red", "Multilineal" = "blue")) +
+    # scale_fill_discrete(name = "Type") +
+    theme(
+        axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 20),
+        axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        plot.title = element_text(size = 25, hjust = 0.5),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20)
+    )
+
+hd_regression_plot <- hd_regression_plot + stat_regline_equation(label.x = 0.62, size = 5, aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~~")))
+
+hd_regression_plot
+ggsave("Figure5.5.png", plot = hd_regression_plot, width = 14, height = 14, dpi = 300)
+# Head Length
+hl_regression_plot <- ggplot(WaspData, aes(x = p.hl, y = o.hl, color = lineage)) +
+    geom_point(size = 3) +
+    theme_classic() +
+    geom_smooth(method = "lm", se = F) +
+    labs(x = "Parent Head Length (mm)", y = "Offspring Head Length (mm)", color = "Type") +
+    scale_color_manual(values = c("Unilineal" = "red", "Multilineal" = "blue")) +
+    # scale_fill_discrete(name = "Type") +
+    theme(
+        axis.text.x = element_text(size = 20),
+        axis.text.y = element_text(size = 20),
+        axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        plot.title = element_text(size = 25, hjust = 0.5),
+        legend.text = element_text(size = 20),
+        legend.title = element_text(size = 20)
+    )
+
+hl_regression_plot <- hl_regression_plot + stat_regline_equation(label.x = 0.8, size = 5, aes(label = paste(..eq.label.., ..rr.label.., sep = "~~~~")))
+
+ggsave("Figure5.6.png", plot = hl_regression_plot, width = 14, height = 14, dpi = 300)
+
+```
+
