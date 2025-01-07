@@ -154,7 +154,7 @@ plot2 <- ggplot(hostData_long, aes(x = HostSpecies, y = value, fill = HostSpecie
   )
 #   scale_fill_manual(values = c("C. maculata" = "orange", "H. convergens" = "orange", "C. septempunctata" = "purple"))
 plot2
-ggsave("Figure3.1_alternate.png", plot = plot, width = 16, height = 14, dpi = 300)
+ggsave("Figure3.1_alternate.png", plot = plot2, width = 16, height = 14, dpi = 300)
 
 ```
 
