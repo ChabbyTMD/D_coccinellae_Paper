@@ -31,6 +31,7 @@ library(ggfortify)
 library(egg)
 library(tagger)
 library(rstatix)
+library(ggpmisc)
 ```
 # Data Import
 
@@ -560,7 +561,7 @@ ggsave("Figure5.X.png", plot = cond, width = 27, height = 35, dpi = 450)
 # Figure 6
 ```{r}
 ggplot(data = WaspData, aes(x = p.wl, y = o.wl, color = p.host)) +
-    stat_poly_line() +
+    stat_poly_line(se = FALSE) +
     stat_poly_eq(use_label(c("eq", "R2"))) +
     geom_point() +
     geom_smooth(method = lm, se = FALSE) +
