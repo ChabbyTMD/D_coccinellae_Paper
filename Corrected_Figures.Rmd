@@ -559,22 +559,6 @@ ggsave("Figure5.X.png", plot = cond, width = 27, height = 35, dpi = 450)
 
 # Figure 6
 ```{r}
-fig4_title_names <- c(
-    "o.wl" = "Wing Length",
-    "o.tl" = "Thorax Length",
-    "o.td" = "Thorax Depth",
-    "o.al" = "Abdomen Length",
-    "o.hd" = "Head Depth",
-    "o.hl" = "Head Length",
-    "o.ms" = "Mass"
-)
-UniHeadLength <- ggplot(UniSorted, aes(x = p.hl, y = o.hl, color = p.host)) +
-    geom_point() +
-    geom_smooth(method = lm, se = F) +
-    xlab("P Head Length") +
-    ylab("O Head Length") +
-    ggtitle("Unilineal Head Length Heritability")
-
 ggplot(data = WaspData, aes(x = p.wl, y = o.wl, color = p.host)) +
     stat_poly_line() +
     stat_poly_eq(use_label(c("eq", "R2"))) +
@@ -584,27 +568,5 @@ ggplot(data = WaspData, aes(x = p.wl, y = o.wl, color = p.host)) +
         x = "Parent Wing Length (mm)",
         y = "Offspring Wing Length (mm)"
         # color = "Type"
-    )
-
-ggplot(data = WaspData, aes(x = p.wl, y = o.wl, color = p.host)) +
-    geom_point() +
-    geom_smooth(method = lm, se = FALSE) +
-    # stat_poly_line(se = FALSE) +
-    stat_poly_eq(use_label(c("eq", "R2")), size = 9) +
-    labs(
-        x = "Parent Wing Length (mm)",
-        y = "Offspring Wing Length (mm)"
-        # color = "Type"
-    )
-
-ggplot(data = WaspData) +
-    facet_wrap(~p.host) +
-
-
-
-ggplot() +
-    geom_text(
-        aes(x = 0.5, y = 0.5, label = "X"),
-        size = 20
     )
 ```
