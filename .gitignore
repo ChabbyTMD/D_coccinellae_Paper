@@ -4,6 +4,7 @@
 *.Rhistory
 *.Rproj
 *.html
+*.png
 *-workspace
 multivariate_multiple_regression.Rmd
 Midterm3.Rmd
@@ -11,5 +12,8 @@ RDA and Multiple_regression.Rmd
 RDA.png
 *.pdf
 Analysis.Rmd
+wasp_lm.Rmd
+wasp_data.xlsx
+Draft_Corrected_Figures.Rmd
 RDA_elipse.png
 rough_Draft.Rmd
