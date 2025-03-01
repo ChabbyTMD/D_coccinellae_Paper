@@ -9,7 +9,6 @@ Load important libraries
 ```{r, include=F}
 # setwd("/set/path/here")
 
-setwd("/home/trevor/Desktop/SUMMER_2024/WASP/D_coccinellae_Paper")
 library(corrplot)
 library(factoextra)
 library(vegan)
@@ -41,21 +40,9 @@ offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
 parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
 parent.center$parent_host<-WaspData$p.host
 parent.center$offspring_host<-WaspData$o.host
-
-```
-Let's start by addressing an important experimental validation: Are the beetles we used actually different sizes?
-We have 3 host species, supposedly small, medium, and large. We have 8 morphometric measurements for each of these.
-
-To do this, we can perform a Multivariate Analysis of Variance (MANOVA). MANOVA assumes homogeneity of covariance matrices as well as multivariate normality. 
-
-Start by importing the data.
-
-```{r}
-
 hostData=read_excel("DATA/morpho_data_analysis.xlsx",sheet="host_size_var_nomissing",col_names=TRUE)
 hostData=subset(hostData,select=c(1,2,8,14,20,26,32,38,44))
 hostData=hostData[-c(46:51),]
-# hostData=rename(hostData,HostSpecies = HostSpecies...1) This errors out
 names(hostData)[names(hostData) == "HostSpecies...1"] <- "HostSpecies"
 
 #Now it's usable 
@@ -142,9 +129,6 @@ anova(wasp.rda2, by="terms", permutations = 9999)
 # Inspect for colinearity before creating a simpler model. Note that we are looking for VIF lower than 20.
 # All our terms are less than 20, therefore we can proceed with the reduced model.
 vif.cca(wasp.rda2)
-# All factors are less than 20 therefore we shall proceed by subsetting the parent.center dataframe to only include these terms in reduced.env
-# Colinearity can be checked using the variance inflation factor function in the vif.cca package. 
-# We can carry on with forward selection if we find the model being significant.
 ```
 
 # Final RDA Ordination Plot
@@ -162,11 +146,5 @@ ordiellipse(final_ord, groups=parent.center.copy$offspring_host,
                                    kind="sd",
                                    col="black",
                                    label=T)
-
-# ordiellipse(final_ord, groups=parent.center.copy$parent_host, 
-#                                    display="sites", 
-#                                    kind="sd",
-#                                    col="red",
-#                                    label=T)
 title("RDA Analysis of Combined Unilineal and Multilineal Lines")
 ```
