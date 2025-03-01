@@ -13,10 +13,10 @@ git clone https://github.com/ChabbyTMD/D_coccinellae_Paper.git
 ```
 2. Set Working Path
 
-At the beginning of each analysis script in the `Libraries` subsection, set the relative or absolute path to the `morph_data_bk.xlsx` file from the `DATA` directory
+At the beginning of each analysis R script in the `Libraries` subsection, set the relative or absolute path to the `morph_data_bk.xlsx` file from the `DATA` directory.
 
-## Statistical Analyses
+## Statistical Analysis and Figure Directories
 
-1. Parent Offspring Regressions (Linear_Regression)
-2. Redundancy Analysis (RDA)
+1. Parent Offspring Regressions ([Linear_Regression](Linear_Regression/wasp_lm.Rmd))
+2. Redundancy Analysis ([RDA](RDA/Final_RDA_Analysis.Rmd))
 3. Paper Figures (Figures)
