@@ -12,5 +12,6 @@ RDA.png
 *.pdf
 Analysis.Rmd
 RDA_elipse.png
-rough_Draft.Rmd*.png
+rough_Draft.Rmd
+*.png
 Draft_Corrected_Figures.Rmd
