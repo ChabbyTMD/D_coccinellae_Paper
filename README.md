@@ -2,6 +2,8 @@
 
 *Authors:* Alicia Tovar, Scott Monahan, Trevor Mugoya, Adrian Kristan, Walker Welch, Ryan, Dettmers, Camila Arce, Theresa Buck, Michele Ruben, Alexander Rothenberg, Roxane Saisho, Ryan Cartmill, Timothy Skaggs, Robert Reyes, MJ Lee, John Obrycki, William Kristan, Arun Sethuraman.
 
+[![DOI](https://zenodo.org/badge/821150787.svg)](https://doi.org/10.5281/zenodo.14954765)
+
 Find our [preprint!](https://www.biorxiv.org/content/10.1101/2022.12.02.518902v3)
 
 ## Preliminary Setup.
