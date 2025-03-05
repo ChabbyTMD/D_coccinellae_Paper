@@ -14,7 +14,7 @@ Import libraries and the data:
 library(tidyverse)
 library(readxl)
 
-wasp <- read_excel("DATA/morph_data_bk.xlsx")
+wasp <- read.csv2("DATA/morph_data_bk.csv", sep = ",")
 wasp$p.host.sl <- as.factor(wasp$p.host.sl)
 
 ```
