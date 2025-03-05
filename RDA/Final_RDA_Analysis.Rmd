@@ -8,13 +8,11 @@ output: pdf
 Load important libraries 
 ```{r, include=F}
 # setwd("/set/path/here")
-
 library(corrplot)
 library(factoextra)
 library(vegan)
 library(tidyverse)
 library(Hmisc)
-library(readxl)
 # Note: before installing MVN package ensure that libgsl is installed with sudo apt-get install libgsl-dev
 library(MVN)
 library(heplots)
@@ -28,9 +26,12 @@ library(languageR)
 
 ```{r}
 # Creating seperate dataframes for response(offspring morphology) and predictor(parent morphology and bettle host type) matrices
-WaspData=read_excel("DATA/morph_data_bk.xlsx")
+# WaspData=read_excel("DATA/morph_data_bk.xlsx")
+WaspData <- read.csv2("DATA/morph_data_bk.csv", sep = ",")
 offspringwasp<-WaspData[,14:19]
+offspringwasp <- offspringwasp %>% mutate_all(as.numeric)
 parentwasp<-WaspData[,4:9]
+parentwasp <- parentwasp %>% mutate_all(as.numeric)
 ```
 
 # Data Preparation
@@ -40,7 +41,7 @@ offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
 parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
 parent.center$parent_host<-WaspData$p.host
 parent.center$offspring_host<-WaspData$o.host
-hostData=read_excel("DATA/morpho_data_analysis.xlsx",sheet="host_size_var_nomissing",col_names=TRUE)
+hostData <- read.csv2("DATA/hostData.csv", sep = ",")
 hostData=subset(hostData,select=c(1,2,8,14,20,26,32,38,44))
 hostData=hostData[-c(46:51),]
 names(hostData)[names(hostData) == "HostSpecies...1"] <- "HostSpecies"
@@ -55,12 +56,6 @@ View(hostData)
 
 # Pairwise correlation in our environmental variables
 languageR::pairscor.fnc(parentwasp)
-# Center and Scale parent and offspring morphmometrics prior to fitting RDA model
-
-offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
-parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
-parent.center$parent_host<-WaspData$p.host
-parent.center$offspring_host<-WaspData$o.host
 # Full RDA model
 wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+parent_host+offspring_host, data=parent.center)
 # wasp.rda<-rda(offspring.center~p.wl+p.tl+p.td+p.al+p.hd+p.hl+offspring_host, data=parent.center)
@@ -82,11 +77,11 @@ anova.cca(wasp.rda, by = "terms")
 # The following function tests whether the order of the explanatory variables is significant
 anova.cca(wasp.rda, by = "margin")
 
-
+# R^2 Value
 R2 <- RsquareAdj(wasp.rda)$r.squared
 R2 
 
-# adjusted R^2.
+# Adjusted R^2 Value.
 R2adj <- RsquareAdj(wasp.rda)$adj.r.squared
 R2adj 
 
@@ -112,11 +107,14 @@ parent.center.copy$setup <- ifelse(parent.center.copy$parent_host == parent.cent
 # Step wise reduction of predictors.
 step.wasp <- step(wasp.rda, scope = formula(wasp.rda), test = "perm")
 summary(step.wasp)
-# p.td, p.hd, and offspring_host are the predictors in the best model.
+# p.td, p.hd, and offspring_host are the predictors in the best model based on lowest AIC.
 vif.cca(step.wasp)
 # VIF of predictors is less than 20, therefore we can proceed with the reduced model.
 wasp.rda2 <- rda(offspring.center ~ p.td + p.hd + offspring_host, data = parent.center.copy) 
 summary(wasp.rda2)
+# Inspect for colinearity before creating a simpler model. Note that we are looking for VIF lower than 20.
+# All our terms are less than 20, therefore we can proceed with the reduced model.
+vif.cca(wasp.rda2)
 RsquareAdj(wasp.rda2)$adj.r.squared
 sqrt(vif.cca(wasp.rda2))
 # Global RDA significance
@@ -125,10 +123,8 @@ anova.cca(wasp.rda2, permutations = 9999) #We reject H0
 anova.cca(wasp.rda2, by = "axis")
 # Term significance
 anova.cca(wasp.rda2, by = "terms")
+
 anova(wasp.rda2, by="terms", permutations = 9999)
-# Inspect for colinearity before creating a simpler model. Note that we are looking for VIF lower than 20.
-# All our terms are less than 20, therefore we can proceed with the reduced model.
-vif.cca(wasp.rda2)
 ```
 
 # Final RDA Ordination Plot
