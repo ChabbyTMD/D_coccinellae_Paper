@@ -26,7 +26,6 @@ library(languageR)
 
 ```{r}
 # Creating seperate dataframes for response(offspring morphology) and predictor(parent morphology and bettle host type) matrices
-# WaspData=read_excel("DATA/morph_data_bk.xlsx")
 WaspData <- read.csv2("DATA/morph_data_bk.csv", sep = ",")
 offspringwasp<-WaspData[,14:19]
 offspringwasp <- offspringwasp %>% mutate_all(as.numeric)
