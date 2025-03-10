@@ -1,0 +1,264 @@
+---
+title: "Supplement for Tovar et al."
+author: "Bill Kristan"
+date: "2025-03-07"
+output:
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(digits = 3)
+library(ggplot2)
+library(car)
+library(yacca)
+library(CCA)
+
+```
+
+## Figure 4
+
+Import the data:
+
+```{r import.reg.cca.data}
+
+read.csv("../DATA/regression_cca.csv") -> wasp.data
+
+wasp.data$type <- factor(wasp.data$type, levels=c("Unilineal","Multilineal"))
+
+```
+
+CCA of parent/offspring morphology.
+
+Lists of variables, and an empty list to add cca models to for the final comparison between them:
+
+```{r import.data.make.variable.lists}
+
+mother.var <- c("p.wl","p.tl","p.td","p.al","p.hd","p.hl")
+daughter.var <- c("o.wl","o.tl","o.td","o.al","o.hd","o.hl")
+
+cca.models <- list()
+
+```
+
+Standardize the variables:
+
+```{r pairs.mother.daughter, results='hide'}
+
+mother.std <- scale(wasp.data[mother.var])
+daughter.std <- scale(wasp.data[daughter.var])
+
+```
+
+### Initial CCA - correlation of mother morphology and daughter morphology without accounting for either host
+
+This first analysis will establish the pattern of correlation between mothers and daughters - since the host the mothers developed in and that the daughters developed in are not accounted for any correlation between them could be due either to mothers assessment of her own state (e.g. her size or shape), or to a reaction by the mother to either host:
+
+```{r initial.cca}
+
+cca(mother.std, daughter.std) -> cca.models$nopartial
+
+F.test.cca(cca.models$nopartial)
+
+cca.models$nopartial
+
+```
+
+Only the first canonical correlation is statistically significant.
+
+## Calculating residuals for use in partial CCA
+
+To assess whether the size of the first canonical correlation is affected by parent host species, offspring host species or combinations of the two we calculated residuals for models using either mother or daughter morphology as responses and hosts as responses. These residuals were then subjected to CCA.
+
+The residuals for each set of morphology data are calculated for each host type here:
+
+
+```{r get.residuals}
+
+scale(residuals(lm(as.matrix(wasp.data[mother.var])~p.host, data = wasp.data))) -> mom.phost.resid
+scale(residuals(lm(as.matrix(wasp.data[daughter.var])~p.host, data = wasp.data))) -> daughter.phost.resid
+scale(residuals(lm(as.matrix(wasp.data[mother.var])~o.host, data = wasp.data))) -> mom.ohost.resid
+scale(residuals(lm(as.matrix(wasp.data[daughter.var])~o.host, data = wasp.data))) -> daughter.ohost.resid
+scale(residuals(lm(as.matrix(wasp.data[mother.var])~interaction(p.host,o.host), data = wasp.data))) -> mom.phostxohost.resid
+scale(residuals(lm(as.matrix(wasp.data[daughter.var])~interaction(p.host,o.host), data = wasp.data))) -> daughter.phostxohost.resid
+
+```
+
+### Accounting for mother's host
+
+The partial CCA that removed the effect of mother's host:
+
+```{r cca.mother.host.partialed}
+
+cca(mom.phost.resid, daughter.phost.resid, xcenter=T, ycenter=T, xscale=T, yscale=T) -> cca.models$phost
+
+F.test.cca(cca.models$phost)
+
+cat("Canonical correlations\n")
+summary(cca.models$phost)$corr
+cat("\n")
+c(parent.redundancy = summary(cca.models$phost)$xrd, offspring.redundancy = summary(cca.models$phost)$yrd)
+
+```
+
+The size of the canonical correlation is virtually unchanged, as is the redundancy.
+
+### Accounting for offspring host
+
+The CCA that removed the effect of offspring host:
+
+```{r cca.offspring.host.partialled}
+
+cca(mom.ohost.resid, daughter.ohost.resid, xcenter=T, ycenter=T, xscale=T, yscale=T) -> cca.models$ohost
+
+F.test.cca(cca.models$ohost)
+
+cat("Canonical correlations\n")
+summary(cca.models$ohost)$corr
+cat("\n")
+c(parent.redundancy = summary(cca.models$ohost)$xrd, offspring.redundancy = summary(cca.models$ohost)$yrd)
+```
+
+The results are again relatively unchanged overall in terms of the size and significance of the canonical correlations, and the redundancy between the matrices.
+
+### Accounting for combinations of mother and daughter host
+
+CCA accounting for both mother and daughter host:
+
+```{r cca.offspring.parent.host.partialled}
+
+cca(mom.phostxohost.resid, daughter.phostxohost.resid, xcenter=T, ycenter=T, xscale=T, yscale=T) -> cca.models$phostxohost
+
+F.test.cca(cca.models$phostxohost)
+
+cat("Canonical correlations\n")
+summary(cca.models$phostxohost)$corr
+cat("\n")
+c(parent.redundancy = summary(cca.models$phostxohost)$xrd, offspring.redundancy = summary(cca.models$phostxohost)$yrd)
+
+```
+
+Accounting for both the parent and offspring host increases the size of the canonical correlation, and increases the redundancy coefficients.
+
+### Controlling for mother's host in mother's data, offspring host in offspring data
+
+Next, controlling for mother's host on mother's morphology, and for offspring host on offspring morphology; this does not partial out the effect of host, since there can be some effect of mother's host on offspring morphology, but it accounts for the host that is most likely to be affecting each morphological matrix.
+
+CCA:
+
+```{r cca.offspring.host.parent.host.accounted.for}
+
+cca(mom.phost.resid, daughter.ohost.resid, xcenter=T, ycenter=T, xscale=T, yscale=T) -> cca.models$phost.mom.ohost.daughter
+
+F.test.cca(cca.models$phost.mom.ohost.daughter)
+
+cat("Canonical correlations\n")
+summary(cca.models$phost.mom.ohost.daughter)$corr
+cat("\n")
+c(parent.redundancy = summary(cca.models$phost.mom.ohost.daughter)$xrd, offspring.redundancy = summary(cca.models$phost.mom.ohost.daughter)$yrd)
+
+```
+
+This analysis reduces the redundancy somewhat, but the pattern in the loadings is unchanged.
+
+### Controlling for mother host in mother data, and mother/daughter host combinations in daughter
+
+Finally, since offspring morphology can be affected by mother host, but mother morphology cannot be affected by offspring host, this analysis accounts for mother host in the mother's data, and both mother and offspring host in the daughter's data.
+
+CCA:
+
+```{r cca.offspring.parent.daughter.host.parent.host.mother.accounted.for}
+
+cca(mom.phost.resid, daughter.phostxohost.resid, xcenter=T, ycenter=T, xscale=T, yscale=T) -> cca.models$phost.mom.phostxohost.daughter
+
+F.test.cca(cca.models$phost.mom.phostxohost.daughter)
+
+cat("Canonical correlations\n")
+summary(cca.models$phost.mom.phostxohost.daughter)$corr
+cat("\n")
+c(parent.redundancy = summary(cca.models$phost.mom.phostxohost.daughter)$xrd, offspring.redundancy = summary(cca.models$phost.mom.phostxohost.daughter)$yrd)
+
+```
+
+The canonical correlation and redundancy are higher than when only offspring host was accounted for in the daughter's data, but not as high as when both parent and offspring hosts were accounted for in both of mother and daughter's data. The pattern in the loadings is unchanged.
+
+A table of canonical correlations:
+
+```{r can.cors.all.models}
+
+data.frame(CC = sapply(cca.models, FUN = function(x) round(x$corr[[1]], digits = 2))) -> all.cc
+all.cc$Model <- rownames(all.cc)
+all.cc$lab <- paste("R = ", all.cc$CC)
+
+```
+
+A graph of the CCA1 loadings for each model - first combine the loadings across the models, so that they can be faceted in the graph (some loadings needed to be flipped to align them on the graphs across models, so some are multiplied by -1):
+
+```{r rbind.loadings}
+
+cca.models$nopartial$xstructcorr <- -1*cca.models$nopartial$xstructcorr
+cca.models$nopartial$ystructcorr <- -1*cca.models$nopartial$ystructcorr
+
+cca.models$phost$xstructcorr <- -1*cca.models$phost$xstructcorr
+cca.models$phost$ystructcorr <- -1*cca.models$phost$ystructcorr
+
+cca.models$ohost$xstructcorr <- -1*cca.models$ohost$xstructcorr
+cca.models$ohost$ystructcorr <- -1*cca.models$ohost$ystructcorr
+
+
+
+cca.models$phost.mom.phostxohost.daughter$xstructcorr <- -1*cca.models$phost.mom.phostxohost.daughter$xstructcorr
+cca.models$phost.mom.phostxohost.daughter$ystructcorr <- -1*cca.models$phost.mom.phostxohost.daughter$ystructcorr
+
+
+stack(lapply(cca.models, FUN = function(x) x$xstructcorr[,1])) -> parent.loadings
+colnames(parent.loadings) <- c("Loadings","Model")
+parent.loadings$Variable <- rownames(cca.models$nopartial$xstructcorr)
+parent.loadings$Generation <- c("Parent")
+
+stack(lapply(cca.models, FUN = function(x) x$ystructcorr[,1])) -> offspring.loadings
+colnames(offspring.loadings) <- c("Loadings","Model")
+offspring.loadings$Variable <- rownames(cca.models$nopartial$ystructcorr)
+offspring.loadings$Generation <- c("Offspring")
+
+rbind(parent.loadings, offspring.loadings) -> cca.loadings
+
+data.frame(Variable = c(daughter.var, mother.var), Var = c("WL","TL","TD","AL","HD","HL","WL","TL","TD","AL","HD","HL")) -> var.labs
+
+mod.name.levels <- c("No partial", "P host","O host","P x O","P host P, O host O", "P host P, P x O host O")
+
+data.frame(Model = names(cca.models), Mod.name = mod.name.levels) -> mod.labs
+
+merge(cca.loadings, var.labs, by = c("Variable","Variable")) -> cca.loadings
+merge(cca.loadings, mod.labs, by = c("Model","Model")) -> cca.loadings
+
+cca.loadings$Mod.name <- factor(cca.loadings$Mod.name, levels = c("No partial","P host","O host","P x O", "P host P, O host O", "P host P, P x O host O"))
+
+split(cca.loadings, cca.loadings$Generation) -> cca.loadings.split
+
+merge(all.cc, mod.labs, by = c("Model","Model")) -> all.cc
+all.cc$Loadings = c(1, 1, 1, 1, 1, 1)
+
+```
+
+Graph the loadings:
+
+```{r graph.of.loadings}
+
+ggplot(cca.loadings, aes(x = Loadings, y = as.numeric(Mod.name))) +
+  geom_hline(yintercept = seq(1,6), color = "gray") +
+  geom_vline(xintercept = 0) +
+  geom_point(aes(color = Generation)) + 
+  geom_text(data = cca.loadings.split$Offspring, aes(label = Var), nudge_y = 0.2, color = "red") + 
+  geom_text(data = cca.loadings.split$Parent, aes(label = Var), nudge_y = -0.2, color = "black") + 
+  scale_x_continuous(limits = c(-0.5,1.1)) +
+  scale_color_manual(values = c("red","black")) +
+  scale_y_continuous(breaks = seq(1,6), labels = levels(cca.loadings$Mod.name)) +
+  labs(x = "CCA 1") +
+  geom_text(data = all.cc, aes(label = lab, y = as.numeric(factor(Mod.name, levels = mod.name.levels))), nudge_y = 0.2) +
+  theme_classic() +
+  theme(axis.title.y = element_blank())
+
+```
+
+The canonical correlations are very consistent across all the models, but increase slightly when parent host, offspring host, or combinations of the two are accounted for in either parent or offspring morphology.
