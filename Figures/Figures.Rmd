@@ -18,6 +18,7 @@ library(readxl)
 library(MVN)
 library(heplots)
 library(devtools)
+library(remotes)
 # install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
 library(pairwiseAdonis)
 library(packfor)
@@ -38,7 +39,7 @@ library(ggpmisc)
 
 ```{r}
 # Creating seperate dataframes for response(offspring morphology) and predictor(parent morphology and bettle host type) matrices
-WaspData=read_excel("DATA/morph_data_bk.xlsx")
+WaspData <- read.csv2("DATA/morph_data_bk.csv", sep = ",")
 offspringwasp<-WaspData[,14:19]
 parentwasp<-WaspData[,4:9]
 ```
@@ -52,7 +53,7 @@ parent.center$parent_host<-WaspData$p.host
 parent.center$offspring_host<-WaspData$o.host
 
 # Importing host species data
-hostData=read_excel("DATA/morpho_data_analysis.xlsx",sheet="host_size_var_nomissing",col_names=TRUE)
+hostData <- read.csv2("DATA/hostData.csv", sep = ",")
 hostData=subset(hostData,select=c(1,2,8,14,20,26,32,38,44))
 hostData=hostData[-c(46:51),]
 names(hostData)[names(hostData) == "HostSpecies...1"] <- "HostSpecies"
