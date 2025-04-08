@@ -46,12 +46,6 @@ parentwasp<-WaspData[,4:9]
 
 # Data Preparation
 ```{r}
-# Center and scale both the morphometrics in the wasp offspring and parent matrices prior to fitting RDA model.
-offspring.center<-as.data.frame(scale(offspringwasp, center = T, scale = T))
-parent.center<-as.data.frame(scale(parentwasp, center = T,scale = T))
-parent.center$parent_host<-WaspData$p.host
-parent.center$offspring_host<-WaspData$o.host
-
 # Importing host species data
 hostData <- read.csv2("DATA/hostData.csv", sep = ",")
 hostData=subset(hostData,select=c(1,2,8,14,20,26,32,38,44))
