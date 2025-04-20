@@ -1,92 +1,45 @@
-﻿HostSpecies,BodyLengthD,,,,,HostSpecies,BodyWidthD,,,,,HostSpecies,ElytronChordLengthL,,,,,HostSpecies,BodyDepthL,,,,,HostSpecies,PronotumLengthL,,,,,HostSpecies,PronotumWidthV,,,,,HostSpecies,AbdominalLengthV,,,,,HostSpecies,AbdominalWidthV,,,
-C. maculata,4.899,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,2.838,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,3.922,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,1.39,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,1.097,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,1.608,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,3.337,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,2.28,t-Test: Two-Sample Assuming Unequal Variances,,
-C. maculata,4.977,,,,,C. maculata,2.871,,,,,C. maculata,4.029,,,,,C. maculata,1.5,,,,,C. maculata,1.192,,,,,C. maculata,1.608,,,,,C. maculata,3.578,,,,,C. maculata,2.305,,,
-C. maculata,4.998,BodyLengthD,C.mac,C7,,C. maculata,2.953,BodyWidthD,C.mac,C7,,C. maculata,4.171,ElytronChordLengthL,C.mac,C7,,C. maculata,1.521,BodyDepthL,C.mac,C7,,C. maculata,1.21,PronotumLengthL,C.mac,C7,,C. maculata,1.65,PronotumWidthV,C.mac,C7,,C. maculata,3.636,AbdominalLengthV,C.mac,C7,,C. maculata,2.316,AbdominalWidthV,C.mac,C7
-C. maculata,5.073,Mean,5.554315789,6.782333333,,C. maculata,3.012,Mean,3.222210526,5.092166667,,C. maculata,4.235,Mean,4.477421053,6.032166667,,C. maculata,1.602,Mean,1.787,2.811833333,,C. maculata,1.256,Mean,1.373894737,1.945333333,,C. maculata,1.758,Mean,1.984684211,2.986,,C. maculata,3.721,Mean,4.094157895,5.2045,,C. maculata,2.424,Mean,2.607842105,4.126
-C. maculata,5.152,Variance,0.162208006,0.270425067,,C. maculata,3.038,Variance,0.046327953,0.086978567,,C. maculata,4.272,Variance,0.078031146,0.219906567,,C. maculata,1.602,Variance,0.030262889,0.053848167,,C. maculata,1.263,Variance,0.013424988,0.043513467,,C. maculata,1.785,Variance,0.053804673,0.0929284,,C. maculata,3.915,Variance,0.089773585,0.0304051,,C. maculata,2.454,Variance,0.028106807,0.0657476
-C. maculata,5.155,Observations,19,6,,C. maculata,3.047,Observations,19,6,,C. maculata,4.273,Observations,19,6,,C. maculata,1.623,Observations,19,6,,C. maculata,1.268,Observations,19,6,,C. maculata,1.8,Observations,19,6,,C. maculata,3.915,Observations,19,6,,C. maculata,2.459,Observations,19,6
-C. maculata,5.337,Hypothesized Mean Difference,0,,,C. maculata,3.05,Hypothesized Mean Difference,0,,,C. maculata,4.277,Hypothesized Mean Difference,0,,,C. maculata,1.704,Hypothesized Mean Difference,0,,,C. maculata,1.287,Hypothesized Mean Difference,0,,,C. maculata,1.847,Hypothesized Mean Difference,0,,,C. maculata,3.918,Hypothesized Mean Difference,0,,,C. maculata,2.489,Hypothesized Mean Difference,0,
-C. maculata,5.358,df,7,,,C. maculata,3.051,df,7,,,C. maculata,4.279,df,6,,,C. maculata,1.71,df,7,,,C. maculata,1.296,df,6,,,C. maculata,1.873,df,7,,,C. maculata,3.969,df,15,,,C. maculata,2.559,df,6,
-C. maculata,5.376,t Stat,-5.303826779,,,C. maculata,3.081,t Stat,-14.36951597,,,C. maculata,4.319,t Stat,-7.701102867,,,C. maculata,1.724,t Stat,-9.969366568,,,C. maculata,1.323,t Stat,-6.405383746,,,C. maculata,1.886,t Stat,-7.397919742,,,C. maculata,3.997,t Stat,-11.22047651,,,C. maculata,2.597,t Stat,-13.61303474,
-C. maculata,5.497,P(T<=t) one-tail,0.000559356,,,C. maculata,3.186,P(T<=t) one-tail,9.40999E-07,,,C. maculata,4.355,P(T<=t) one-tail,0.00012559,,,C. maculata,1.78,P(T<=t) one-tail,1.09156E-05,,,C. maculata,1.357,P(T<=t) one-tail,0.000341301,,,C. maculata,1.967,P(T<=t) one-tail,7.48437E-05,,,C. maculata,4.052,P(T<=t) one-tail,5.38206E-09,,,C. maculata,2.602,P(T<=t) one-tail,4.87757E-06,
-C. maculata,5.527,t Critical one-tail,1.894578605,,,C. maculata,3.246,t Critical one-tail,1.894578605,,,C. maculata,4.382,t Critical one-tail,1.943180281,,,C. maculata,1.784,t Critical one-tail,1.894578605,,,C. maculata,1.386,t Critical one-tail,1.943180281,,,C. maculata,1.989,t Critical one-tail,1.894578605,,,C. maculata,4.078,t Critical one-tail,1.753050356,,,C. maculata,2.61,t Critical one-tail,1.943180281,
-C. maculata,5.572,P(T<=t) two-tail,0.001118713,,,C. maculata,3.255,P(T<=t) two-tail,1.882E-06,,,C. maculata,4.448,P(T<=t) two-tail,0.000251181,,,C. maculata,1.831,P(T<=t) two-tail,2.18312E-05,,,C. maculata,1.395,P(T<=t) two-tail,0.000682602,,,C. maculata,2.011,P(T<=t) two-tail,0.000149687,,,C. maculata,4.089,P(T<=t) two-tail,1.07641E-08,,,C. maculata,2.622,P(T<=t) two-tail,9.75514E-06,
-C. maculata,5.628,t Critical two-tail,2.364624252,,,C. maculata,3.258,t Critical two-tail,2.364624252,,,C. maculata,4.504,t Critical two-tail,2.446911851,,,C. maculata,1.863,t Critical two-tail,2.364624252,,,C. maculata,1.427,t Critical two-tail,2.446911851,,,C. maculata,2.012,t Critical two-tail,2.364624252,,,C. maculata,4.121,t Critical two-tail,2.131449546,,,C. maculata,2.636,t Critical two-tail,2.446911851,
-C. maculata,5.72,,,,,C. maculata,3.28,,,,,C. maculata,4.564,,,,,C. maculata,1.89,,,,,C. maculata,1.435,,,,,C. maculata,2.032,,,,,C. maculata,4.165,,,,,C. maculata,2.71,,,
-C. maculata,5.767,,,,,C. maculata,3.396,,,,,C. maculata,4.682,,,,,C. maculata,1.893,,,,,C. maculata,1.441,,,,,C. maculata,2.096,,,,,C. maculata,4.208,,,,,C. maculata,2.738,,,
-C. maculata,5.843,,,,,C. maculata,3.405,,,,,C. maculata,4.683,,,,,C. maculata,1.902,,,,,C. maculata,1.441,,,,,C. maculata,2.137,,,,,C. maculata,4.363,,,,,C. maculata,2.772,,,
-C. maculata,5.968,,,,,C. maculata,3.454,,,,,C. maculata,4.752,,,,,C. maculata,1.925,,,,,C. maculata,1.486,,,,,C. maculata,2.143,,,,,C. maculata,4.41,,,,,C. maculata,2.775,,,
-C. maculata,6.035,,,,,C. maculata,3.502,,,,,C. maculata,4.903,,,,,C. maculata,1.954,,,,,C. maculata,1.488,,,,,C. maculata,2.224,,,,,C. maculata,4.42,,,,,C. maculata,2.796,,,
-C. maculata,6.251,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,3.508,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,4.962,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,1.957,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,1.532,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,2.419,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,4.486,t-Test: Two-Sample Assuming Unequal Variances,,,,C. maculata,2.798,t-Test: Two-Sample Assuming Unequal Variances,,
-C. maculata,6.298,,,,,C. maculata,3.629,,,,,C. maculata,4.981,,,,,C. maculata,2.188,,,,,C. maculata,1.621,,,,,C. maculata,2.472,,,,,C. maculata,4.748,,,,,C. maculata,2.887,,,
-C. septempunctata,5.506,BodyLengthD,C.mac,H.con,,C. septempunctata,4.178,BodyWidthD,C.mac,H.con,,C. septempunctata,5.108,ElytronChordLengthL,C.mac,H.con,,C. septempunctata,2.438,BodyDepthL,C.mac,H.con,,C. septempunctata,1.37,PronotumLengthL,C.mac,H.con,,C. septempunctata,2.619,PronotumWidthV,C.mac,H.con,,C. septempunctata,4.436,AbdominalLengthV,C.mac,H.con,,C. septempunctata,3.115,AbdominalWidthV,C.mac,H.con
-C. septempunctata,5.896,Mean,5.554315789,5.708588235,,C. septempunctata,4.66,Mean,3.222210526,3.655764706,,C. septempunctata,5.279,Mean,4.477421053,4.820588235,,C. septempunctata,2.478,Mean,1.787,2.017529412,,C. septempunctata,1.588,Mean,1.373894737,1.601294118,,C. septempunctata,2.708,Mean,1.984684211,2.237882353,,C. septempunctata,5.043,Mean,4.094157895,4.240941176,,C. septempunctata,3.695,Mean,2.607842105,3.495470588
-C. septempunctata,6.568,Variance,0.162208006,0.173094007,,C. septempunctata,4.978,Variance,0.046327953,0.073109566,,C. septempunctata,5.682,Variance,0.078031146,0.113014757,,C. septempunctata,2.606,Variance,0.030262889,0.04737114,,C. septempunctata,1.88,Variance,0.013424988,0.040838221,,C. septempunctata,2.772,Variance,0.053804673,0.059326235,,C. septempunctata,5.045,Variance,0.089773585,0.114880559,,C. septempunctata,4.006,Variance,0.028106807,2.698958015
-C. septempunctata,6.704,Observations,19,17,,C. septempunctata,5.01,Observations,19,17,,C. septempunctata,6.11,Observations,19,17,,C. septempunctata,2.828,Observations,19,17,,C. septempunctata,1.925,Observations,19,17,,C. septempunctata,2.861,Observations,19,17,,C. septempunctata,5.056,Observations,19,17,,C. septempunctata,4.137,Observations,19,17
-C. septempunctata,7.002,Hypothesized Mean Difference,0,,,C. septempunctata,5.075,Hypothesized Mean Difference,0,,,C. septempunctata,6.242,Hypothesized Mean Difference,0,,,C. septempunctata,2.868,Hypothesized Mean Difference,0,,,C. septempunctata,1.982,Hypothesized Mean Difference,0,,,C. septempunctata,2.948,Hypothesized Mean Difference,0,,,C. septempunctata,5.315,Hypothesized Mean Difference,0,,,C. septempunctata,4.18,Hypothesized Mean Difference,0,
-C. septempunctata,7.207,df,33,,,C. septempunctata,5.316,df,31,,,C. septempunctata,6.324,df,31,,,C. septempunctata,3.008,df,31,,,C. septempunctata,2.123,df,25,,,C. septempunctata,3.079,df,33,,,C. septempunctata,5.354,df,32,,,C. septempunctata,4.308,df,16,
-C. septempunctata,7.317,t Stat,-1.127571217,,,C. septempunctata,5.514,t Stat,-5.28140708,,,C. septempunctata,6.556,t Stat,-3.309055016,,,C. septempunctata,3.083,t Stat,-3.483557148,,,C. septempunctata,2.174,t Stat,-4.078411362,,,C. septempunctata,3.548,t Stat,-3.184541345,,,C. septempunctata,5.414,t Stat,-1.369797509,,,C. septempunctata,4.43,t Stat,-2.217398106,
-H. convergens,4.635,P(T<=t) one-tail,0.133816506,,,H. convergens,2.789,P(T<=t) one-tail,4.7916E-06,,,H. convergens,3.86,P(T<=t) one-tail,0.001189814,,,H. convergens,1.672,P(T<=t) one-tail,0.000748782,,,H. convergens,1.13,P(T<=t) one-tail,0.00020249,,,H. convergens,1.781,P(T<=t) one-tail,0.001579614,,,H. convergens,3.382,P(T<=t) one-tail,0.090142968,,,H. convergens,2.322,P(T<=t) one-tail,0.02071158,
-H. convergens,5.039,t Critical one-tail,1.692360309,,,H. convergens,3.108,t Critical one-tail,1.695518783,,,H. convergens,4.31,t Critical one-tail,1.695518783,,,H. convergens,1.7,t Critical one-tail,1.695518783,,,H. convergens,1.265,t Critical one-tail,1.708140761,,,H. convergens,1.827,t Critical one-tail,1.692360309,,,H. convergens,3.583,t Critical one-tail,1.693888748,,,H. convergens,2.674,t Critical one-tail,1.745883676,
-H. convergens,5.262,P(T<=t) two-tail,0.267633011,,,H. convergens,3.191,P(T<=t) two-tail,9.58319E-06,,,H. convergens,4.418,P(T<=t) two-tail,0.002379628,,,H. convergens,1.743,P(T<=t) two-tail,0.001497563,,,H. convergens,1.3,P(T<=t) two-tail,0.00040498,,,H. convergens,2.004,P(T<=t) two-tail,0.003159229,,,H. convergens,3.741,P(T<=t) two-tail,0.180285937,,,H. convergens,2.73,P(T<=t) two-tail,0.041423161,
-H. convergens,5.328,t Critical two-tail,2.034515297,,,H. convergens,3.342,t Critical two-tail,2.039513446,,,H. convergens,4.435,t Critical two-tail,2.039513446,,,H. convergens,1.817,t Critical two-tail,2.039513446,,,H. convergens,1.402,t Critical two-tail,2.059538553,,,H. convergens,2.011,t Critical two-tail,2.034515297,,,H. convergens,3.861,t Critical two-tail,2.036933343,,,H. convergens,2.795,t Critical two-tail,2.119905299,
-H. convergens,5.359,,,,,H. convergens,3.459,,,,,H. convergens,4.525,,,,,H. convergens,1.837,,,,,H. convergens,1.411,,,,,H. convergens,2.014,,,,,H. convergens,3.928,,,,,H. convergens,2.877,,,
-H. convergens,5.407,,,,,H. convergens,3.524,,,,,H. convergens,4.586,,,,,H. convergens,1.842,,,,,H. convergens,1.471,,,,,H. convergens,2.022,,,,,H. convergens,4.023,,,,,H. convergens,2.909,,,
-H. convergens,5.413,,,,,H. convergens,3.557,,,,,H. convergens,4.661,,,,,H. convergens,1.874,,,,,H. convergens,1.499,,,,,H. convergens,2.125,,,,,H. convergens,4.089,,,,,H. convergens,3.101,,,
-H. convergens,5.444,,,,,H. convergens,3.565,,,,,H. convergens,4.666,,,,,H. convergens,1.939,,,,,H. convergens,1.526,,,,,H. convergens,2.128,,,,,H. convergens,4.216,,,,,H. convergens,3.103,,,
-H. convergens,5.49,,,,,H. convergens,3.607,,,,,H. convergens,4.685,,,,,H. convergens,1.946,,,,,H. convergens,1.575,,,,,H. convergens,2.18,,,,,H. convergens,4.219,,,,,H. convergens,3.141,,,
-H. convergens,5.738,t-Test: Two-Sample Assuming Unequal Variances,,,,H. convergens,3.726,t-Test: Two-Sample Assuming Unequal Variances,,,,H. convergens,4.827,t-Test: Two-Sample Assuming Unequal Variances,,,,H. convergens,1.96,t-Test: Two-Sample Assuming Unequal Variances,,,,H. convergens,1.606,t-Test: Two-Sample Assuming Unequal Variances,,,,H. convergens,2.224,t-Test: Two-Sample Assuming Unequal Variances,,,,H. convergens,4.227,t-Test: Two-Sample Assuming Unequal Variances,,,,H. convergens,3.17,t-Test: Two-Sample Assuming Unequal Variances,,
-H. convergens,5.822,,,,,H. convergens,3.776,,,,,H. convergens,4.889,,,,,H. convergens,2.017,,,,,H. convergens,1.619,,,,,H. convergens,2.243,,,,,H. convergens,4.387,,,,,H. convergens,3.171,,,
-H. convergens,5.945,BodyLengthD,H.con,C7,,H. convergens,3.792,BodyWidthD,H.con,C7,,H. convergens,4.926,ElytronChordLengthL,H.con,C7,,H. convergens,2.084,BodyDepthL,H.con,C7,,H. convergens,1.68,PronotumLengthL,H.con,C7,,H. convergens,2.258,PronotumWidthV,H.con,C7,,H. convergens,4.389,AbdominalLengthV,H.con,C7,,H. convergens,3.236,AbdominalWidthV,H.con,C7
-H. convergens,5.952,Mean,5.708588235,6.782333333,,H. convergens,3.844,Mean,3.655764706,5.092166667,,H. convergens,4.926,Mean,4.820588235,6.032166667,,H. convergens,2.113,Mean,2.017529412,2.811833333,,H. convergens,1.712,Mean,1.601294118,1.945333333,,H. convergens,2.287,Mean,2.237882353,2.986,,H. convergens,4.449,Mean,4.240941176,5.2045,,H. convergens,3.25,Mean,3.495470588,4.126
-H. convergens,5.975,Variance,0.173094007,0.270425067,,H. convergens,3.863,Variance,0.073109566,0.086978567,,H. convergens,4.94,Variance,0.113014757,0.219906567,,H. convergens,2.157,Variance,0.04737114,0.053848167,,H. convergens,1.727,Variance,0.040838221,0.043513467,,H. convergens,2.385,Variance,0.059326235,0.0929284,,H. convergens,4.51,Variance,0.114880559,0.0304051,,H. convergens,3.3,Variance,2.698958015,0.0657476
-H. convergens,5.998,Observations,17,6,,H. convergens,3.892,Observations,17,6,,H. convergens,5.103,Observations,17,6,,H. convergens,2.215,Observations,17,6,,H. convergens,1.738,Observations,17,6,,H. convergens,2.477,Observations,17,6,,H. convergens,4.511,Observations,17,6,,H. convergens,3.315,Observations,17,6
-H. convergens,6.066,Hypothesized Mean Difference,0,,,H. convergens,3.906,Hypothesized Mean Difference,0,,,H. convergens,5.203,Hypothesized Mean Difference,0,,,H. convergens,2.226,Hypothesized Mean Difference,0,,,H. convergens,1.776,Hypothesized Mean Difference,0,,,H. convergens,2.513,Hypothesized Mean Difference,0,,,H. convergens,4.524,Hypothesized Mean Difference,0,,,H. convergens,3.393,Hypothesized Mean Difference,0,
-H. convergens,6.104,df,7,,,H. convergens,3.928,df,8,,,H. convergens,5.305,df,7,,,H. convergens,2.333,df,8,,,H. convergens,1.924,df,9,,,H. convergens,2.592,df,7,,,H. convergens,4.531,df,18,,,H. convergens,3.45,df,18,
-H. convergens,6.704,t Stat,-4.567976617,,,H. convergens,4.068,t Stat,-10.47687659,,,H. convergens,5.545,t Stat,-5.822540166,,,H. convergens,2.495,t Stat,-7.324201719,,,H. convergens,1.991,t Stat,-3.501412028,,,H. convergens,2.754,t Stat,-5.430582918,,,H. convergens,4.908,t Stat,-8.860822724,,,H. convergens,9.808,t Stat,-1.530518633,
-,,P(T<=t) one-tail,0.001290164,,,,,P(T<=t) one-tail,2.99419E-06,,,,,P(T<=t) one-tail,0.00032423,,,,,P(T<=t) one-tail,4.0975E-05,,,,,P(T<=t) one-tail,0.0033543,,,,,P(T<=t) one-tail,0.000488005,,,,,P(T<=t) one-tail,2.77551E-08,,,,,P(T<=t) one-tail,0.071636781,
-,,t Critical one-tail,1.894578605,,,,,t Critical one-tail,1.859548038,,,,,t Critical one-tail,1.894578605,,,,,t Critical one-tail,1.859548038,,,,,t Critical one-tail,1.833112933,,,,,t Critical one-tail,1.894578605,,,,,t Critical one-tail,1.734063607,,,,,t Critical one-tail,1.734063607,
-,,P(T<=t) two-tail,0.002580329,,,,,P(T<=t) two-tail,5.98839E-06,,,,,P(T<=t) two-tail,0.000648459,,,,,P(T<=t) two-tail,8.195E-05,,,,,P(T<=t) two-tail,0.0067086,,,,,P(T<=t) two-tail,0.000976009,,,,,P(T<=t) two-tail,5.55101E-08,,,,,P(T<=t) two-tail,0.143273562,
-heterscedasticity,,t Critical two-tail,2.364624252,,,,,t Critical two-tail,2.306004135,,,,,t Critical two-tail,2.364624252,,,,,t Critical two-tail,2.306004135,,,,,t Critical two-tail,2.262157163,,,,,t Critical two-tail,2.364624252,,,,,t Critical two-tail,2.10092204,,,,,t Critical two-tail,2.10092204,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-kruskal-wallas,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+﻿WaspID,HostSpecies,Body Length,Body Width,Elytron Chord Length,Body Depth,Pronotum Length,Pronotum Width,Abdominal Length,Abdominal Width
+1_C7_into_Cm_1_G3,C. maculata,4.977,3.05,4.235,1.521,1.441,1.785,3.915,2.489
+1_C7_into_Cm_10_G4,C. maculata,5.152,3.047,4.277,1.78,1.287,1.8,4.208,2.424
+1_C7_into_Cm_2_G3,C. maculata,5.358,2.871,4.279,1.602,1.488,1.758,3.997,2.305
+1_C7_into_Cm_22_G1_2Aa2,C. maculata,5.843,3.396,4.752,1.925,1.621,2.032,4.165,2.798
+1_C7_into_Cm_23_G1_2Ab2,C. maculata,4.998,3.051,4.029,1.623,1.296,1.65,3.578,2.28
+1_C7_into_Cm_24_G1_2Aa5,C. maculata,5.72,3.28,4.319,1.89,1.097,2.011,3.969,2.559
+1_C7_into_Cm_25_G1_2Ab5,C. maculata,6.298,3.629,4.981,2.188,1.486,2.137,4.748,2.636
+1_C7_into_Cm_3_G3,C. maculata,5.073,2.838,3.922,1.5,1.192,1.847,3.636,2.316
+1_C7_into_Cm_4_G3,C. maculata,5.572,3.081,4.504,1.71,1.441,1.989,4.089,2.61
+1_C7_into_Cm_5_G3,C. maculata,4.899,3.038,4.355,1.724,1.21,1.873,3.915,2.597
+1_C7_into_Hc_into_Cm_G1_A_2Da3,C. maculata,6.035,3.454,4.448,1.954,1.395,2.472,4.42,2.887
+1_C7_into_Hc_into_Cm_G1_B_2Db3,C. maculata,5.376,3.186,4.564,1.831,1.256,2.224,4.078,2.71
+1_C7_into_Hc_into_Cm_G1_C_2Dc3,C. maculata,5.155,2.953,4.272,1.704,1.323,2.096,3.337,2.459
+1_Hc_into_Cm_1_G1 2Cb2,C. maculata,6.251,3.508,4.962,1.957,1.357,2.012,4.363,2.796
+1_Hc_into_Cm_13_C_2Cc2,C. maculata,5.497,3.246,4.382,1.863,1.435,1.886,3.721,2.622
+1_Hc_into_Cm_2_A_G1_2Ca2,C. maculata,5.628,3.502,4.682,1.902,1.386,1.967,4.121,2.775
+1_Hc_into_Cm_3_2Ca4,C. maculata,5.968,3.405,4.903,1.602,1.427,2.419,4.41,2.772
+2_Hc_into_Cm_1_G3,C. maculata,5.527,3.258,4.273,1.784,1.268,1.608,4.052,2.602
+2_Hc_into_Cm_13_G1_3Ba4,C. maculata,5.767,3.255,4.683,1.893,1.532,2.143,4.486,2.738
+2_Hc_into_Cm_2_G3,C. maculata,5.337,3.012,4.171,1.39,1.263,1.608,3.918,2.454
+1_C7_into_Cm_into_C7_G1_3Aa3,C. septempunctata,7.002,5.316,6.11,2.868,1.982,2.948,5.354,4.43
+1_Cm_into_C7_1_G1,C. septempunctata,7.317,5.514,6.324,3.083,2.174,3.079,5.315,4.18
+1_Cm_into_C7_2_G1_3A_1,C. septempunctata,6.568,4.978,6.242,2.828,1.925,2.861,5.045,4.006
+1_Cm_into_C7_3_G2_3Aa4,C. septempunctata,7.207,5.01,6.556,3.008,2.123,3.548,5.056,4.308
+2_Cm_into_C7_3_G1,C. septempunctata,6.704,5.075,5.682,2.606,1.88,2.619,5.414,4.137
+2_Hc_into_C7_1_G2,C. septempunctata,5.896,4.66,5.279,2.478,1.588,2.772,4.436,3.695
+2_Hc_into_C7_5_G1_3Ga2,C. septempunctata,5.506,4.178,5.108,2.438,1.37,2.708,5.043,3.115
+1_C7_into_Cm_into_Hc_G1_1Ca3,H. convergens,5.407,3.108,4.418,1.837,1.526,2.513,4.023,2.73
+1_C7_into_Cm_into_Hc_G1_1Cc3,H. convergens,5.413,3.557,4.586,1.7,1.265,2.258,3.741,2.877
+1_C7_into_Hc_3_G2_a_1Da2,H. convergens,5.359,3.607,4.666,2.113,1.606,2.022,3.861,3.103
+1_C7_into_Hc_4_G2_B_1Db2,H. convergens,4.635,2.789,3.86,1.743,1.13,2.18,3.382,2.322
+1_Cm_into_Hc_1_G1,H. convergens,6.104,3.928,5.305,2.333,1.619,2.243,4.449,3.3
+1_Cm_into_Hc_1_G1_1C_1_1D_1,H. convergens,5.998,3.863,5.203,2.215,1.712,2.125,4.389,3.171
+1_Cm_into_Hc_2_G1,H. convergens,5.039,3.191,4.31,1.874,1.499,1.827,3.583,2.674
+2_C7_into_Hc_1_G1,H. convergens,5.328,3.342,4.435,1.817,1.738,2.287,3.928,2.795
+2_Cm_into_Hc_1_G1,H. convergens,5.945,3.776,4.926,1.946,1.727,2.477,4.531,3.25
+2_Cm_into_Hc_2_G2,H. convergens,5.49,3.565,4.525,1.96,1.411,2.128,4.387,2.909
+2_Hc_into_C7_into_Hc_1_G1,H. convergens,5.975,3.906,5.103,1.842,1.924,2.385,4.219,3.17
+2_Hc_into_Cm_into_Hc_1_G1,H. convergens,5.822,3.726,4.889,2.226,1.776,2.004,4.511,3.393
+2_Hc_into_Hc_1_G3,H. convergens,5.952,3.892,4.94,1.939,1.68,1.781,4.524,3.141
+2_Hc_into_Hc_12_1Ba3,H. convergens,6.704,4.068,5.545,2.495,1.991,2.754,4.908,3.45
+2_Hc_into_Hc_2_G3,H. convergens,5.262,3.459,4.685,1.672,1.402,2.014,4.216,9.808
+2_Hc_into_Hc_3_G3,H. convergens,5.444,3.792,4.827,2.017,1.3,2.011,4.227,3.236
+2_Hc_into_Hc_6_G1_1Ba1,H. convergens,6.066,3.844,4.926,2.084,1.575,2.592,4.51,3.315
